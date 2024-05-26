@@ -1,35 +1,66 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
+// Base multiple counter array with buttons code from:
+// https://react.dev/learn/updating-arrays-in-state#replacing-items-in-an-array
+
+let itemNames: string[]=['milk','eggs','cheese']
+
+let initialCounters = [
+  0, 0, 0
+];
+
+export default function CounterList() {
+  const [counters, setCounters] = useState(
+    initialCounters
+  );
+
+  function handleIncrementClick(index: number) {
+    const nextCounters = counters.map((c, i) => {
+      if (i === index) {
+        // Increment the clicked counter
+        return c + 1;
+      } else {
+        // The rest haven't changed
+        return c;
+      }
+    });
+    setCounters(nextCounters);
+  }
+
+  return (
+    <ul>
+      {counters.map((counter, i) => (
+        <li key={i}>
+          {counter}
+          {' '}
+          <button onClick={() => {
+            handleIncrementClick(i);
+          }}>{itemNames[i]}</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+{/*
 function App() {
-  const [count, setCount] = useState(0)
+  const [eggcount, setCount] = useState(0);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+      <div className="menu item">
+        <button onClick={() => setCount((eggcount) => eggcount + 1)}>
+          <div>#14</div>
+          <div><h2>Eggs</h2></div>
         </button>
+        {' '}
         <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
+          Amount of Eggs ordered: {eggcount}
         </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
 
 export default App
+*/}
