@@ -4,13 +4,14 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AppController } from './app.controller';
 import { AppService } from './app.service'
 import { UserModule } from './user/user.module';
+import { CountModule } from './count/count.module';
 
 @Module({
   imports: [
       ConfigModule.forRoot(),
       // Configure a typeorm module for use.
       TypeOrmModule.forRoot({
-        type: "mysql",
+        type: "postgres",
         host: process.env.DB_HOST,
         port: parseInt(process.env.DB_PORT, 10),
         username: process.env.DB_USERNAME,
@@ -27,6 +28,7 @@ import { UserModule } from './user/user.module';
          *                data loss or schema changes **/
       }),
       UserModule,
+      CountModule,
   ],
     controllers: [AppController],
     providers: [AppService],
