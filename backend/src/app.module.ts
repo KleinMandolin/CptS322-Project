@@ -27,7 +27,6 @@ import { CountModule } from './count/count.module';
       /** synchronize: true should only be used in development. If used in production, this can lead to unexpected
        *                data loss or schema changes **/
     }),
-    UserModule,
     CountModule,
   ],
   controllers: [AppController],
