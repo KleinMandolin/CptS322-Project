@@ -28,8 +28,6 @@ DB_NAME=counter
 <li>sudo service postgresql start</li>
 <li>psql -U postgres</li>
 <li>CREATE DATABASE counter;</li>
-<li>CREATE USER 'counter_user' WITH PASSWORD 'bad_pass'</li>
-<li>GRANT ALL PRIVILEGES ON DATABASE counter TO counter_user</li>
 <li>\q</li>
 <em>* By default, the user, 'postgres', should have no password</em>
 </b></ol><br/>
