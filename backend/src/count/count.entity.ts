@@ -4,9 +4,9 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 // Creates an entity for typeorm to do some black-box magic.
 @Entity()
 export class Count {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ default: 0 })
-    value: number;
+  @Column({ default: 0 })
+  value: number;
 }
