@@ -3,7 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
 import { CountModule } from './count/count.module';
 
 @Module({
@@ -27,7 +26,6 @@ import { CountModule } from './count/count.module';
       /** synchronize: true should only be used in development. If used in production, this can lead to unexpected
        *                data loss or schema changes **/
     }),
-    UserModule,
     CountModule,
   ],
   controllers: [AppController],
