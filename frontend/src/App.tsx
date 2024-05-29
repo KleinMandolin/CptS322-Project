@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
 
+/*
 // Base multiple counter array with buttons code from:
 // https://react.dev/learn/updating-arrays-in-state#replacing-items-in-an-array
 
@@ -42,25 +43,48 @@ export default function CounterList() {
     </ul>
   );
 }
-{/*
+*/
 function App() {
-  const [eggcount, setCount] = useState(0);
+  const [secretClickCount, setCount] = useState(0);
+  const [publicClickCount, setPubCount] = useState(0);
+  const [currTime, setTime] = useState('12:00');
 
   return (
     <>
-      <div className="menu item">
-        <button onClick={() => setCount((eggcount) => eggcount + 1)}>
-          <div>#14</div>
-          <div><h2>Eggs</h2></div>
+      <div className="click button">
+        <button onClick={() => setCount(secretClickCount + 1)}>
+          <div>
+            <h2>Click me!</h2>
+          </div>
         </button>
-        {' '}
+      </div>
+
+      <div className="click count">
+        <p>Times button has been clicked: {publicClickCount}</p>
+        <button onClick={() => setPubCount(secretClickCount)}>
+          <div>Refresh Count</div>
+        </button>{' '}
+        <button
+          onClick={() => {
+            setPubCount(0);
+            setCount(0);
+          }}
+        >
+          <div>Reset Count</div>
+        </button>
+      </div>
+
+      <div className="time button">
         <p>
-          Amount of Eggs ordered: {eggcount}
+          <button onClick={() => setTime('6:00')}>
+            <div>
+              <h2>The time is: {currTime}</h2>
+            </div>
+          </button>
         </p>
       </div>
     </>
-  )
+  );
 }
 
-export default App
-*/}
+export default App;
