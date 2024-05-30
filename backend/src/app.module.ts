@@ -10,6 +10,7 @@ import { CountModule } from './count/count.module';
     ConfigModule.forRoot(),
     // Configure a typeorm module for use.
     TypeOrmModule.forRoot({
+      // Database
       type: 'postgres',
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT, 10),
@@ -20,11 +21,12 @@ import { CountModule } from './count/count.module';
       // of the current module, e.g., CptS322-Project/backend/src/user
       // This is then concatenated with a recursive glob pattern
       // `/**/*/*.entity{.ts,.js}'
-
       synchronize: true, // Synchronize tells the database to synchronize the schema with defined entities.
 
       /** synchronize: true should only be used in development. If used in production, this can lead to unexpected
        *                data loss or schema changes **/
+
+
     }),
     CountModule,
   ],

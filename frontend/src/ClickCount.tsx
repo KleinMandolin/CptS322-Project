@@ -2,7 +2,7 @@ import React from 'react';
 
 // basic code implementation for fetch based on: https://jasonwatmore.com/post/2020/01/27/react-fetch-http-get-request-examples
 
-class ClickCount extends React.Component<any, any> {
+class ClickCount extends React.Component { // Accepting types <any,any> accepts everything; not necessary.
   constructor(props) {
     super(props);
 
@@ -10,13 +10,20 @@ class ClickCount extends React.Component<any, any> {
       count: null,
       errorMessage: null,
     };
+
+    this.getCount = this.getCount.bind(this);
+    this.incrCount = this.incrCount.bind(this);
+    this.resetCount = this.resetCount.bind(this);
+  }
+
+  componentDidMount() {
+      this.getCount()
   }
 
   // function to fetch backend's total click count via GET
   getCount() {
     // for a guaranteed functioning version, try GET with
     // https://api.npms.io/v2/search?q=react and data.total
-
     fetch('http://localhost:3000/count/total', { method: 'GET' }) // url to access, GET call
       .then(async (response) => {
         const data = await response.json();
@@ -32,7 +39,7 @@ class ClickCount extends React.Component<any, any> {
       })
       .catch((error) => {
         this.setState({ errorMessage: error.toString() });
-        console.error('There was an error!', error);
+        console.error('Error in get count.', error);
       });
   }
 
@@ -53,17 +60,22 @@ class ClickCount extends React.Component<any, any> {
           return Promise.reject(error);
         }
         // PUT is just backend function call, do nothing with returned data
+        // We want to update our component after incrementing.
+        this.getCount()
       })
       .catch((error) => {
         this.setState({ errorMessage: error.toString() });
-        console.error('There was an error!', error);
+        console.error('Error in increment count.', error);
       });
   }
 
   // function to tell backend to reset count via empty PUT
   resetCount() {
+      if(this.state == 0) // Update the state only if necessary.
+          return
+
     fetch('http://localhost:3000/count/reset', {
-      method: 'PUT',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({}), // empty data, PUT is just function call to backend
     })
@@ -77,60 +89,43 @@ class ClickCount extends React.Component<any, any> {
           return Promise.reject(error);
         }
         // PUT is just backend function call, do nothing with returned data
+        // We want to update the count after resets.
+        this.getCount()
       })
       .catch((error) => {
         this.setState({ errorMessage: error.toString() });
-        console.error('There was an error!', error);
+        console.error('Error in reset count.', error);
       });
   }
 
   render() {
-    this.getCount();
     return (
-      <>
-        <div className="click button">
-          <button
-            onClick={() => {
-              this.setState({ count: 0 });
-              this.incrCount();
-            }}
-          >
-            <h1>Click me!</h1>
-          </button>
-        </div>
+        <>
+          <div className="click button">
+            <button onClick={this.incrCount}>
+              <h1>Click me!</h1>
+            </button>
+          </div>
 
-        <div className="count description">
-          <p>
-            <h2>Click count is: {this.state.count}</h2>
-          </p>
-          <code>
+          <div className="count description">
+            <h2>Click count is: <u><b><em>{this.state.count}</em></b></u></h2>
             <p>
-              Fetching current count may take a while. The value becomes the
-              placeholders below to show the button press has been acknowledged.
+              Clicking the button above will update a value in a postgresql database. You'll notice after refresh,
+              the count remains the same - the click count is maintained by the backend.
             </p>
             <p>
-              'Reset Count' will make the displayed count 1, before becoming the
-              backend's reset count of 0.
+              Reset count returns value to 0.
             </p>
-            <p>
-              'Click me!' will make the displayed count 0, before becoming the
-              backend's current stored count.
-            </p>
-          </code>
-        </div>
+          </div>
 
-        <div className="reset button">
-          <button
-            onClick={() => {
-              this.setState({ count: 1 });
-              this.resetCount();
-            }}
-          >
-            Reset Count
-          </button>
-        </div>
-      </>
+          <div className="reset button">
+          <button onClick={this.resetCount}>
+              Reset Count
+            </button>
+          </div>
+        </>
     );
   }
 }
+
 export default ClickCount;
