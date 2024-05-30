@@ -5,38 +5,19 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
+.click.button {
+  padding: 2em;
   will-change: filter;
   transition: filter 300ms;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.click.button:hover {
+  filter: drop-shadow(0 0 3em #ffbb00);
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
+.reset.button {
   padding: 2em;
+  will-change: filter;
+  transition: filter 300ms;
 }
-
-.read-the-docs {
-  color: #888;
+.reset.button:hover {
+  filter: drop-shadow(0 0 1em #00ccff);
 }
