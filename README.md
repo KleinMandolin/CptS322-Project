@@ -57,23 +57,21 @@ Key features of pg:
 ### Installation Steps
 
 ### Clone the Repository
-<code>
-git clone https://github.com/KleinMandolin/CptS322-Project
-</code>
+<code>git clone https://github.com/KleinMandolin/CptS322-Project</code>
 
 ### Install
-<code>cd CptS322-Project</code>
-<code>git checkout preproject</code>
-<code>cd frontend</code>
-<code>npm i</code>
-<code>cd ../backend</code>
-<code>npm i</code>
-<code>chmod +x createdb.sh</code>
-<code>./createdb.sh</code>
-<code>echo 'DB_HOST=localhost</code>
-<code>DB_PORT=5432</code>
-<code>DB_USERNAME=postgres</code>
-<code>DB_NAME=counter' > .env</code>
+<code>cd CptS322-Project</code><br/>
+<code>git checkout preproject</code><br/>
+<code>cd frontend</code><br/>
+<code>npm i</code><br/>
+<code>cd ../backend</code><br/>
+<code>npm i</code><br/>
+<code>chmod +x createdb.sh</code><br/>
+<code>./createdb.sh</code><br/>
+<code>echo 'DB_HOST=localhost</code><br/>
+<code>DB_PORT=5432</code><br/>
+<code>DB_USERNAME=postgres</code><br/>
+<code>DB_NAME=counter' > .env</code><br/>
 
 ## Functionality
 
@@ -98,8 +96,6 @@ Provide steps to reproduce the problem and/or name a file or a function where th
 
 
 ## Contributing
-
-TODO: Leave the steps below if you want others to contribute to your project.
 
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
