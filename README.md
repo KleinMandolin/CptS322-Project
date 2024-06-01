@@ -8,37 +8,90 @@ Contributors: Samantha Brewer, Kyle Lim, Issayas Yohannes
 
 ### One-sentence description of the project
 
-A webapp that can handle restaurant orders, track revenue and ingredient stocks with expiration alerts, and secure logins separating employees and owners/admins.
+A clicker counter that implements the full-power of fullstack framing.
 
 ### Additional information about the project
 
-The project is mainly a web app that can be used by employees to make orders, as well as accessing inventory and revenue information for admins. The UI will be dynamically scalable for tablet and desktop environments, with other layouts such as smaller mobile UIs potentially being supported in later development.
+This project is an exercise to demonstrate the team CodeCrafters is capable of working modularly such 
+that each side of the application can be treated as a black-box with functional endpoints. Though this
+application may appear underwhelming in scale, it is important to note the following:
 
-The order taker will be in the form of a table of menu items, with the user (the employee) being able to select multiple items for the cart and then proceed to checkout.  Actual money handling and transactions will not be implemented for this prototype.
-The inventory tracker will estimate current inventory amounts and will notify the user of soon-to-expire items a defined time before expiration.
-The secure login will be MFA at minimum, with every feature except for the order taker being limited to the administrator/owner role.
+<B>The aims of this project are not to blow your socks off.</b><em> Though, you may find your feet cold and bare in due time...</em>
 
 ## Installation
 
 ### Prerequisites
 
-TODO: List what a user needs to have installed before running the installation instructions below (e.g., git, which versions of Ruby/Rails)
+To run this project on your machine, you will need the following:
+
+<ul>
+ <li>Git version >= 2.x.x</li>
+ <li>Nodejs version >= 20.11.x</li>
+ <li>PostgreSQL >= 16.x</li>
+</ul>
 
 ### Add-ons
 
-TODO: List which add-ons are included in the project, and the purpose each add-on serves in your app.
+typeorm and pg
+
+Key features of typeorm:
+
+<ul>
+ <li>Entity Management</li>
+ <li>Database Abstraction</li>
+ <li>Data Manipulation</li>
+ <li>Repository Pattern</li>
+ <li>Supports Multiple Databases</li>
+</ul>
+
+Key features of pg:
+
+<ul>
+ <li>Connection Management</li>
+ <li>Query Execution</li>
+ <li>Transaction Management</li>
+ <li>Prepared Statements</li>
+</ul>
+
 
 ### Installation Steps
 
-TODO: Describe the installation process (making sure you mention `bundle install`).
-Instructions need to be such that a user can just copy/paste the commands to get things set up and running. 
+## Clone the Repository ##
+<code>
+git clone https://github.com/KleinMandolin/CptS322-Project
+</code>
 
+## Install ##
+<code>
+ cd CptS322-Project
+ git checkout preproject
+ cd frontend
+ npm i
+ cd ../backend
+ npm i
+ chmod +x createdb.sh
+ ./createdb.sh
+ echo 'DB_HOST=localhost
+ DB_PORT=5432
+ DB_USERNAME=postgres
+ DB_NAME=counter' > .env
+</code>
 
 ## Functionality
 
-TODO: Write usage instructions. Structuring it as a walkthrough can help structure this section,
-and showcase your features.
+This project produces a react button with a corresponding count variable. Backend logic counts the total number of times a button has been clicked. You
+Can test this by refreshing your browser. If state is contained in the frontend, then a refresh will reset that state; however, every time the component
+is rendered for the first time, it calls the count/total api from the backend. To use this functionality, perform the following steps:
 
+You will need two terminals open, one for the frontend and one for the backend. In one terminal, in the directory CptS322-Project/backend run the command:
+<code>
+ npm run start
+</code>
+
+In the terminal for the frontend, in the CptS322-Project/frontend directory, run the command:
+<code>
+ npm run dev
+</code>
 
 ## Known Problems
 
