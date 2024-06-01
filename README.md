@@ -56,26 +56,24 @@ Key features of pg:
 
 ### Installation Steps
 
-## Clone the Repository ##
+### Clone the Repository
 <code>
 git clone https://github.com/KleinMandolin/CptS322-Project
 </code>
 
-## Install ##
-<code>
- cd CptS322-Project
- git checkout preproject
- cd frontend
- npm i
- cd ../backend
- npm i
- chmod +x createdb.sh
- ./createdb.sh
- echo 'DB_HOST=localhost
- DB_PORT=5432
- DB_USERNAME=postgres
- DB_NAME=counter' > .env
-</code>
+### Install
+<code>cd CptS322-Project</code>
+<code>git checkout preproject</code>
+<code>cd frontend</code>
+<code>npm i</code>
+<code>cd ../backend</code>
+<code>npm i</code>
+<code>chmod +x createdb.sh</code>
+<code>./createdb.sh</code>
+<code>echo 'DB_HOST=localhost</code>
+<code>DB_PORT=5432</code>
+<code>DB_USERNAME=postgres</code>
+<code>DB_NAME=counter' > .env</code>
 
 ## Functionality
 
