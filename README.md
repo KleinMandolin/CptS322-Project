@@ -89,11 +89,9 @@ In the terminal for the frontend, in the CptS322-Project/frontend directory, run
 
 <code>npm run dev</code>
 
-## Known Problems
+Finally, navigate to the link below in your browser:
 
-TODO: Describe any known issues, bugs, odd behaviors or code smells. 
-Provide steps to reproduce the problem and/or name a file or a function where the problem lives.
-
+<code>http://localhost:3001/</code>
 
 ## Contributing
 
