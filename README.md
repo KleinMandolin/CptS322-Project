@@ -57,9 +57,11 @@ Key features of pg:
 ### Installation Steps
 
 ### Clone the Repository
+
 <code>git clone https://github.com/KleinMandolin/CptS322-Project</code>
 
 ### Install
+
 <code>cd CptS322-Project</code><br/>
 <code>git checkout preproject</code><br/>
 <code>cd frontend</code><br/>
@@ -80,14 +82,12 @@ Can test this by refreshing your browser. If state is contained in the frontend,
 is rendered for the first time, it calls the count/total api from the backend. To use this functionality, perform the following steps:
 
 You will need two terminals open, one for the frontend and one for the backend. In one terminal, in the directory CptS322-Project/backend run the command:
-<code>
- npm run start
-</code>
+
+<code>npm run start</code>
 
 In the terminal for the frontend, in the CptS322-Project/frontend directory, run the command:
-<code>
- npm run dev
-</code>
+
+<code>npm run dev</code>
 
 ## Known Problems
 
