@@ -1,34 +1,29 @@
-
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { MongoClient } = require('mongodb');
-const app = express();
-const port = process.env.PORT || 3001;
+const bodyParser = require('body-parser');
 
-const uri = process.env.MONGODB_URI; 
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const app = express();
+
 
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-app.post('/data', async (req, res) => {
-    try {
-        await client.connect();
-        const database = client.db('howdy'); 
-        const collection = database.collection('howdy'); 
+// Hard-coded credentials
+const hardCodedUsername = 'admin';
+const hardCodedPassword = 'passwordhaha';
 
-        const doc = req.body;
-        const result = await collection.insertOne(doc);
-        res.send(`New document inserted with the following id: ${result.insertedId}`);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Error connecting to the database');
-    } finally {
-        await client.close();
-    }
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  if (username === hardCodedUsername && password === hardCodedPassword) {
+    res.send({ message: 'Login successful', user: { username } });
+  } else {
+    res.send({ message: 'Invalid credentials' });
+  }
 });
 
+
+const port = 5000;
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });
