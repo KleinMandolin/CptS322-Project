@@ -1,4 +1,9 @@
-import { Entity, Column, PrimaryColumn, OneToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { EmpInfo } from '../emp-info/emp.info';
 
 @Entity()
@@ -14,4 +19,13 @@ export class EmpCredentials {
     cascade: true,
   })
   empInfo: EmpInfo;
+
+  // Need to include 2-factor authentication in the credentials table.
+  // Code
+  @Column({ nullable: true })
+  twoFactorCode: string;
+
+  // Expiration date
+  @Column({ nullable: true })
+  twoFactorCodeExpires: Date;
 }

@@ -1,7 +1,15 @@
-import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  OneToOne,
+  JoinColumn,
+  Unique,
+} from 'typeorm';
 import { EmpCredentials } from '../emp-credentials/emp.credentials';
 
 @Entity()
+@Unique(['username'])
 export class EmpInfo {
   @PrimaryColumn()
   username: string;

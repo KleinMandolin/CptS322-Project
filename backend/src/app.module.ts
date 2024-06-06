@@ -7,10 +7,13 @@ import { EmpCredentialsModule } from './emp-credentials/emp-credentials.module';
 import { EmpInfoModule } from './emp-info/emp-info.module';
 import { EmpInfo } from './emp-info/emp.info';
 import { EmpCredentials } from './emp-credentials/emp.credentials';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     // Configure a typeorm module for use.
     TypeOrmModule.forRoot({
       // Database
@@ -31,6 +34,7 @@ import { EmpCredentials } from './emp-credentials/emp.credentials';
     }),
     EmpCredentialsModule,
     EmpInfoModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
