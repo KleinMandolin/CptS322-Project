@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { EmpCredentials } from '../emp-credentials/emp.credentials';
@@ -63,7 +67,7 @@ export class AuthService {
     } catch (error) {
       // Rollback transaction if transaction was unsuccessful.
       await queryRunner.rollbackTransaction();
-      throw new Error(`Failed to create user: ${error.message}`);
+      throw new InternalServerErrorException('Failed to create user');
     } finally {
       // Release the connection back to connection pool.
       await queryRunner.release();
@@ -77,14 +81,14 @@ export class AuthService {
     // Get the employee's credentials.
     const empCredentials = await this.empCredentialsRepository.findOne({
       where: { username: username },
-      relations: ['empInfo'], // Load the empInfo relation.
+      relations: ['empInfo'], // Load the empInfo relation for easy data access.
     });
     // Send vague messages if user credentials don't match up.
     if (!empCredentials) {
       throw new UnauthorizedException('Invalid login');
     }
 
-    if (!this.matchPassword(password, empCredentials)) {
+    if (!(await this.matchPassword(password, empCredentials))) {
       throw new UnauthorizedException('Invalid login');
     }
 
@@ -101,7 +105,7 @@ export class AuthService {
 
     const subject = `Authentication Code`; // Subject: authentication code
     const text = `Hello, ${empInfo.f_name}, this is your authentication code:
-    <br/><br/> <h1>${authCode}</h1>`; // Personalized message for the authentication code.
+    ${authCode}`; // Personalized message for the authentication code.
     await this.email.sendEmail(empInfo.email, subject, text);
 
     return { waitingForCode: true };
@@ -143,11 +147,6 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  // Check the signature of this token.
-  async verifyToken(token: string): Promise<any> {
-    return this.jwtService.verify(token);
-  }
-
   // Compare this password to the hashed password from this employee object.
   private async matchPassword(
     plaintext: string,
@@ -162,7 +161,7 @@ export class AuthService {
     return await bcrypt.hash(password, salt);
   }
 
-  // Generate a two factor authentication code.
+  // Generate a two-factor authentication code.
   private async genTwoFactorCode(): Promise<string> {
     return randomBytes(3).toString('hex');
   }
