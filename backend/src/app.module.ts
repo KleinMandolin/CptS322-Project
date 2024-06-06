@@ -3,7 +3,10 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CountModule } from './count/count.module';
+import { EmpCredentialsModule } from './emp-credentials/emp-credentials.module';
+import { EmpInfoModule } from './emp-info/emp-info.module';
+import { EmpInfo } from './emp-info/emp.info';
+import { EmpCredentials } from './emp-credentials/emp.credentials';
 
 @Module({
   imports: [
@@ -17,7 +20,7 @@ import { CountModule } from './count/count.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'], // __dirname: Node.js global var that refers to the directory
+      entities: [EmpCredentials, EmpInfo], // __dirname: Node.js global var that refers to the directory
       // of the current module, e.g., CptS322-Project/backend/src/user
       // This is then concatenated with a recursive glob pattern
       // `/**/*/*.entity{.ts,.js}'
@@ -25,10 +28,9 @@ import { CountModule } from './count/count.module';
 
       /** synchronize: true should only be used in development. If used in production, this can lead to unexpected
        *                data loss or schema changes **/
-
-
     }),
-    CountModule,
+    EmpCredentialsModule,
+    EmpInfoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
