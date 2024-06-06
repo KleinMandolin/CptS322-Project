@@ -5,7 +5,9 @@ import { EmpInfoService } from './emp-info.service';
 import { EmpInfoController } from './emp-info.controller';
 
 @Module({
+  // Get the entity, EmpInfo.
   imports: [TypeOrmModule.forFeature([EmpInfo])],
+  // providers = services.
   providers: [EmpInfoService],
   controllers: [EmpInfoController],
 })

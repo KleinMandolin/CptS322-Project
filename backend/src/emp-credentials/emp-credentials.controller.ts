@@ -8,10 +8,13 @@ import {
 import { EmpCredentialsService } from './emp-credentials.service';
 import { EmpCredentials } from './emp.credentials';
 
+// Decorator with base path, 'employee/credentials', indicates this route
+// is the controller that handles emp_credentials info.
 @Controller('employee/credentials')
 export class EmpCredentialsController {
   constructor(private readonly empCredentialsService: EmpCredentialsService) {}
 
+  // Register a user using the JSON message.
   @Post('register')
   async register(
     @Body()
@@ -34,7 +37,7 @@ export class EmpCredentialsController {
       body.lastName,
     );
   }
-  // register/login
+  // Login will change soon enough. This does not include two-factor auth.
   @Get('login')
   async login(
     @Body() body: { username: string; password: string },

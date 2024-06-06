@@ -15,6 +15,8 @@ export class EmpInfo {
   @Column()
   l_name: string;
 
+  // Create a one-to-one relationship with the emp_info relation.
+  // The join column indicates the username is a foreign key.
   @OneToOne(() => EmpCredentials, (empCredentials) => empCredentials.empInfo)
   @JoinColumn({ name: 'username' })
   empCredentials: EmpCredentials;

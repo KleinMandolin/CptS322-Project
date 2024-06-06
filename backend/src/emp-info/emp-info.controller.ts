@@ -6,6 +6,7 @@ import { EmpInfoService } from './emp-info.service';
 export class EmpInfoController {
   constructor(private readonly empInfoService: EmpInfoService) {}
 
+  // Get the users information; email, username, first name, and last name.
   @Get('show')
   async getInfo(@Body() body: { username: string }): Promise<EmpInfo> {
     if (await this.empInfoService.containsInfo(body.username)) {

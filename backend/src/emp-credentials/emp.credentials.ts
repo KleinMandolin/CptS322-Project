@@ -9,6 +9,7 @@ export class EmpCredentials {
   @Column()
   password: string;
 
+  // The credential contains the original copy of the username.
   @OneToOne(() => EmpInfo, (empInfo) => empInfo.empCredentials, {
     cascade: true,
   })
