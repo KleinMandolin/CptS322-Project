@@ -10,24 +10,75 @@ class Login extends React.Component<any, any> {
       username: null,
       loginSuccess: false,
       verifySuccess: false,
+      token: null,
       errorMessage: null,
     };
   }
 
-  submitLogin = (event) => {
-    event.preventDefault();
+  submitLogin = async (event) => {
+    // async added before event to allow for async fetch, may be unnecessary
+
+    // testing with no backend
+    /*
     this.setState({ username: event.target.username.value });
     const form = event.target;
     const formData = new FormData(form);
     const formJson = Object.fromEntries(formData.entries());
     console.log(formJson);
-    this.setState({ loginSuccess: true });
+    if (this.state.errorMessage == null) {
+      this.setState({ loginSuccess: true });
+    }
+    */
+
+    this.setState({ username: event.target.username.value });
+    const form = event.target;
+    const formData = new FormData(form);
+    const formJson = Object.fromEntries(formData.entries());
+
+    const response = await fetch('http://localhost:3000/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formJson),
+    });
+    const data = await response.json();
+
+    this.setState({ loginSuccess: data.waitingForCode });
+  };
+
+  submitAuth = async (event) => {
+    // testing with no backend
+    /*
+    const formJson = {
+      username: this.state.username,
+      code: event.target.code.value,
+    };
+    console.log(formJson);
+    this.setState({ verifySuccess: true });
+    */
+
+    // custom json format, instead of direct copy of event form, so that previous username can be reused without prompting
+    const formJson = {
+      username: this.state.username,
+      code: event.target.code.value,
+    };
+
+    const response = await fetch('http://localhost:3000/auth/verify2fa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formJson),
+    });
+    const data = await response.json();
+
+    this.setState({ token: data.accessToken });
+    this.setState({ verifySuccess: true }); // temp, removed when JWT implemented
   };
 
   render() {
-    if (this.state.loginSuccess == false) {
+    if (this.state.loginSuccess != true) {
       return (
-        <div className="login">
+        <div className="user login">
+          <h2>Login</h2>
+
           <form className="userlogin" onSubmit={this.submitLogin}>
             <div className="username">
               <label>
@@ -41,6 +92,7 @@ class Login extends React.Component<any, any> {
                 />
               </label>
             </div>
+
             <div className="password">
               <label>
                 <input
@@ -53,22 +105,40 @@ class Login extends React.Component<any, any> {
                 />
               </label>
             </div>
+
             <button type="submit">Submit</button>
           </form>
         </div>
       );
-    } else if (this.state.verifySuccess == false) {
+    } else if (this.state.verifySuccess != true) {
       return (
         <>
-          {' '}
-          Input Username: {this.state.username}{' '}
-          <button onClick={() => this.setState({ verifySuccess: true })}>
-            go to next screen
-          </button>
+          <div className="2FA login">
+            <p>
+              You will have recieved an authentication code in your email (check
+              spam). Enter it here:
+            </p>
+            <form className="authCode" onSubmit={this.submitAuth}>
+              <label>
+                <input
+                  placeholder="Authentication Code"
+                  spellCheck="false"
+                  name="code"
+                  required
+                />
+              </label>
+              <button type="submit">Submit</button>
+            </form>
+          </div>
         </>
       );
     } else {
-      return <>hello</>;
+      return (
+        <>
+          You've been successfully logged in, {this.state.username}! Your token
+          is <p>{this.state.token}</p>
+        </>
+      );
     }
   }
 }
