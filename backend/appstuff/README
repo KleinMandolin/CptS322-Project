@@ -1,0 +1,1 @@
+Ingredients, Orders, Recipes, RecipeIngredients, Restock, and Restock Items go into their own directory in /backend/src/entity/~. 
