@@ -26,16 +26,40 @@ class Menu extends React.Component<any, any> {
 
   // increments given item count in shopping cart
   incrCount(id) {
-    this.state.cart[id].count = this.state.cart[id].count + 1;
+    // originally
+    //  this.state.cart[id].count = this.state.cart[id].count + 1;
+    // but to trigger rerender, setState is needed, and individual dict
+    // items cannot be edited via setState, so entire dict is copied
+    // code from: https://forum.freecodecamp.org/t/reactjs-using-setstate-to-update-a-single-property-on-an-object/146772/2
+    const cartCopy = JSON.parse(JSON.stringify(this.state.cart));
+    cartCopy[id].count = cartCopy[id].count + 1;
+    this.setState({
+      cart: cartCopy,
+    });
   }
 
   showOrders() {
     if (this.isEmpty(this.state.cart)) {
-      return null;
+      return <p>hello</p>;
     } else {
       //console.log('1' in this.state.cart); true
       //console.log('18' in this.state.cart); false
-      return <div className="menuCart">hello</div>;
+      const data = this.state.cart;
+      return (
+        <div className="menuCart">
+          <ul>
+            {Object.keys(data).map((key) => {
+              if (data[key].count > 0)
+                return (
+                  <li>
+                    {data[key].name}: {data[key].count}
+                  </li>
+                );
+              return null;
+            })}
+          </ul>
+        </div>
+      );
     }
   }
 

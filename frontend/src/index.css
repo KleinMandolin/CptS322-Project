@@ -101,3 +101,8 @@ button {
     height: 150px;
   }
 }
+
+.menuCart {
+  max-width: 40rem;
+  text-align: left;
+}
