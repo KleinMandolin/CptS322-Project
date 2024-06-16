@@ -10,10 +10,23 @@ export class IngredientsService {
     private readonly ingredientsRepository: Repository<Ingredients>,
   ) {}
 
-  async getIngredient(ingredientId: number): Promise<Ingredients> {
+  async getIngredient(ingredientName: string): Promise<Ingredients> {
     return await this.ingredientsRepository.findOne({
-      where: { id: ingredientId },
+      where: { ingredientName: ingredientName },
     });
+  }
+
+  async findOrCreateIngredient(ingredientName: string): Promise<Ingredients> {
+    let ingredient = await this.ingredientsRepository.findOne({
+      where: { ingredientName },
+    });
+
+    if (!ingredient) {
+      ingredient = this.ingredientsRepository.create({ ingredientName });
+      await this.ingredientsRepository.save(ingredient);
+    }
+
+    return ingredient;
   }
 
   async addIngredient(ingredientName: string): Promise<Ingredients> {
@@ -22,13 +35,8 @@ export class IngredientsService {
     return await this.ingredientsRepository.save(ingredient);
   }
 
-  async getQty(ingredientId: number): Promise<number> {
-    const ingredient = await this.getIngredient(ingredientId);
-    return ingredient.qty;
-  }
-
-  async updateQty(ingredientId: number, qty: number): Promise<Ingredients> {
-    const ingredient = await this.getIngredient(ingredientId);
+  async updateQty(ingredientName: string, qty: number): Promise<Ingredients> {
+    const ingredient = await this.getIngredient(ingredientName);
     ingredient.qty = qty;
     return this.ingredientsRepository.save(ingredient);
   }

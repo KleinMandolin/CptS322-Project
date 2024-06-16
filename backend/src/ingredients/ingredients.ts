@@ -1,12 +1,9 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryColumn } from 'typeorm';
 import { RecipeDetails } from '../recipe-details/recipe-details';
 
 @Entity()
 export class Ingredients {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ nullable: false })
+  @PrimaryColumn()
   ingredientName: string;
 
   @Column({ default: 0 })
