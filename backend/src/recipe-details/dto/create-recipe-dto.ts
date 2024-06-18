@@ -18,6 +18,11 @@ export class CreateRecipeDto {
   @IsNotEmpty()
   price: string;
 
+  // The type of meal (e.g., appetizer, main course, dessert, beverage)
+  @IsString()
+  @IsNotEmpty()
+  mealType: 'appetizer' | 'main_course' | 'dessert' | 'beverage';
+
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })

@@ -28,4 +28,11 @@ export class EmpCredentials {
   // Expiration date
   @Column({ nullable: true })
   twoFactorCodeExpires: Date;
+
+  @Column({
+    type: "enum",
+    enum: ["worker", "admin"],
+    default: "worker"
+  })
+  userRole: 'worker' | 'admin';
 }

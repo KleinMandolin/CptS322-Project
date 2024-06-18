@@ -10,6 +10,13 @@ export class Recipes {
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
+  @Column({
+    type: "enum",
+    enum: ["appetizer", "main_course", "dessert", "beverage"],
+    default: "main_course"
+  })
+  mealType: 'appetizer' | 'main_course' | 'dessert' | 'beverage';
+
   @OneToMany(() => RecipeDetails, (recipeDetails) => recipeDetails.recipe)
   recipeDetails: RecipeDetails[];
 

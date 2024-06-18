@@ -30,6 +30,7 @@ export class AuthController {
         createAuthDto.email,
         createAuthDto.firstName,
         createAuthDto.lastName,
+        createAuthDto.userRole,
       );
     } catch (error) {
       throw new BadRequestException(error.message);

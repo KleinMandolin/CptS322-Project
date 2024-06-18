@@ -19,4 +19,7 @@ export class CreateAuthDto {
   @IsString()
   @Length(2, 50)
   lastName: string;
+
+  @IsString()
+  userRole: 'worker' | 'admin';
 }

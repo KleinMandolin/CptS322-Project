@@ -32,6 +32,7 @@ export class AuthService {
     email: string,
     firstName: string,
     lastName: string,
+    userRole: 'worker' | 'admin', // Added userRole parameter to function signature
   ): Promise<{ success: boolean }> {
     // Query runner is needed for insert into multiple relations.
     const queryRunner = this.dataSource.createQueryRunner();
@@ -45,6 +46,7 @@ export class AuthService {
       const empCredentials = new EmpCredentials();
       empCredentials.username = username;
       empCredentials.password = hashedPassword;
+      empCredentials.userRole = userRole; // Set the userRole in empCredentials
 
       // Create the empInfo object.
       const empInfo = new EmpInfo();
@@ -132,10 +134,10 @@ export class AuthService {
     empCredentials.twoFactorCodeExpires = null;
     await this.empCredentialsRepository.save(empCredentials);
 
-    // sub is the unique identifier of this user. Since username is unique in this system, I used username.
+    // Include userRole in the token payload to utilize it for role-based access control in the application.
     const payload = {
-      username: empCredentials.username,
       sub: empCredentials.username,
+      role: empCredentials.userRole,
     };
     const accessToken = await this.generateToken(payload);
 
