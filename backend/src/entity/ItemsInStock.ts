@@ -1,14 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 import { Ingredient } from "./Ingredient";
 import { RestockItems } from "./RestockItems";
 
 @Entity()
 export class ItemsInStock {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn()
+    ingredientId: number;  
 
     @ManyToOne(() => Ingredient, ingredient => ingredient.itemsInStock, { eager: true })
-    @JoinColumn({ name: "ing_id" })
+    @JoinColumn({ name: "ingredientId" })
     ingredient: Ingredient;
 
     @OneToMany(() => RestockItems, restockItems => restockItems.itemInStock)
