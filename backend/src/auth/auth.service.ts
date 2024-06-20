@@ -129,7 +129,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired auth code.');
     }
 
-    // Reset twoFactor auth code fields.
     empCredentials.twoFactorCode = null;
     empCredentials.twoFactorCodeExpires = null;
     await this.empCredentialsRepository.save(empCredentials);
