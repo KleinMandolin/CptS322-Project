@@ -50,13 +50,53 @@ button {
   }
 }
 
+.menu_header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 1em;
+  background-color: lightcoral;
+  z-index: 1000;
+  justify-content: space-between;
+  display: flex;
+  font-size: 0.75em;
+}
+
+.sidebar {
+  z-index: 999;
+  padding: 8px;
+  background-color: rgb(255, 201, 201);
+  color: black;
+  position: fixed;
+  overflow-y: scroll;
+  display: block;
+  top: 4.25em;
+  bottom: 0;
+  right: -16em;
+  width: 14em;
+  -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+  -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+  -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+  transition: opacity 0.3s linear, right 0.3s ease-out;
+}
+
+.sidebar.open {
+  right: 0;
+  -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+  -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+  -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+  transition: opacity 0.3s linear, right 0.3s ease-out;
+}
+
 .menu {
+  padding: 1em;
   width: 90vw;
-  margin: 0 auto;
+  margin-top: 1em;
   max-width: 1170px;
   display: grid;
-  gap: 1rem 0.25rem;
-  justify-items: center;
+  gap: 1rem 2rem;
+  justify-content: center;
 }
 
 .menuItem {

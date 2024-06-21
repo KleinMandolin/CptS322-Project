@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SideBar from './Sidebar.tsx';
 
 class Menu extends React.Component<any, any> {
   constructor(props) {
@@ -7,10 +8,19 @@ class Menu extends React.Component<any, any> {
     this.state = {
       fullmenu: null, // formatting of menu
       cart: {}, // shopping cart dictionary cart[id]={name, price, count}
+      sidebarOpen: false,
     };
     this.populate = this.populate.bind(this);
   }
 
+  // original source link in Sidebar.tsx
+  toggleSidebar = () => {
+    this.setState({ sidebarOpen: !this.state.sidebarOpen });
+  };
+
+  // runs when component mounts (essentially compiles), will (probably?)
+  // not run when switching urls, so if new menu item is added, this.populate
+  // will need to be recalled
   componentDidMount() {
     this.populate();
   }
@@ -40,7 +50,7 @@ class Menu extends React.Component<any, any> {
 
   showOrders() {
     if (this.isEmpty(this.state.cart)) {
-      return <p>hello</p>;
+      return <p>Loading</p>;
     } else {
       //console.log('1' in this.state.cart); true
       //console.log('18' in this.state.cart); false
@@ -49,13 +59,13 @@ class Menu extends React.Component<any, any> {
         <div className="menuCart">
           <ul>
             {Object.keys(data).map((key) => {
-              if (data[key].count > 0)
+              if (data[key].count > 0) {
                 return (
                   <li>
-                    {data[key].name}: {data[key].count}
+                    {data[key].count}x {data[key].name}
                   </li>
                 );
-              return null;
+              }
             })}
           </ul>
         </div>
@@ -127,7 +137,20 @@ class Menu extends React.Component<any, any> {
   render() {
     return (
       <>
-        {this.showOrders()}
+        <div className="menu_header">
+          <span>
+            <button className="return_button">hi</button>
+          </span>
+          <span>
+            <button
+              className="cart_button"
+              onClick={() => this.toggleSidebar()}
+            >
+              hello
+            </button>
+          </span>
+        </div>
+        <SideBar isOpen={this.state.sidebarOpen} data={this.showOrders()} />
         <div className="menu">{this.state?.fullmenu ?? 'Loading'}</div>
       </>
     );
