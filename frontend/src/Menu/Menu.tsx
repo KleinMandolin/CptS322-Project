@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import SideBar from './Sidebar.tsx';
 
+import { FaShoppingCart, FaArrowLeft } from 'react-icons/fa';
+
 class Menu extends React.Component<any, any> {
   constructor(props) {
     super(props);
@@ -139,14 +141,16 @@ class Menu extends React.Component<any, any> {
       <>
         <div className="menu_header">
           <span>
-            <button className="return_button">hi</button>
+            <button className="return_button">
+              <FaArrowLeft />
+            </button>
           </span>
           <span>
             <button
               className="cart_button"
               onClick={() => this.toggleSidebar()}
             >
-              hello
+              <FaShoppingCart />
             </button>
           </span>
         </div>
