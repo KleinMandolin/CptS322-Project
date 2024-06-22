@@ -6,11 +6,11 @@ import {
   JoinColumn,
   Unique,
 } from 'typeorm';
-import { EmpCredentials } from '../emp-credentials/emp.credentials';
+import { UserCredentials } from '@/user-credentials/user-credentials';
 
 @Entity()
 @Unique(['username'])
-export class EmpInfo {
+export class UserInfo {
   @PrimaryColumn()
   username: string;
 
@@ -25,7 +25,7 @@ export class EmpInfo {
 
   // Create a one-to-one relationship with the emp_info relation.
   // The join column indicates the username is a foreign key.
-  @OneToOne(() => EmpCredentials, (empCredentials) => empCredentials.empInfo)
+  @OneToOne(() => UserCredentials, (empCredentials) => empCredentials.empInfo)
   @JoinColumn({ name: 'username' })
-  empCredentials: EmpCredentials;
+  userCredentials: UserCredentials;
 }

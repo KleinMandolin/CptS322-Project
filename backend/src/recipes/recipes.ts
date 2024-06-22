@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
-import { RecipeDetails } from '../recipe-details/recipe-details';
+import { RecipeIngredients } from '@/recipe-ingredients/recipe-ingredients';
 import { OrderDetails } from '../order-details/order-details';
 
 @Entity()
@@ -17,8 +17,8 @@ export class Recipes {
   })
   mealType: 'appetizer' | 'main_course' | 'dessert' | 'beverage';
 
-  @OneToMany(() => RecipeDetails, (recipeDetails) => recipeDetails.recipe)
-  recipeDetails: RecipeDetails[];
+  @OneToMany(() => RecipeIngredients, (recipeDetails) => recipeDetails.recipe)
+  recipeDetails: RecipeIngredients[];
 
   @OneToMany(
     () => OrderDetails,

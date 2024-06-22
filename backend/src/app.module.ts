@@ -3,16 +3,16 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { EmpCredentialsModule } from './emp-credentials/emp-credentials.module';
-import { EmpInfoModule } from './emp-info/emp-info.module';
-import { EmpInfo } from './emp-info/emp.info';
-import { EmpCredentials } from './emp-credentials/emp.credentials';
+import { UserCredentialsModule } from '@/user-credentials/user-credentials.module';
+import { UserInfoModule } from '@/user-info/user-info.module';
+import { UserInfo } from '@/user-info/user-info';
+import { UserCredentials } from '@/user-credentials/user-credentials';
 import { AuthModule } from './auth/auth.module';
-import { RecipeDetailsModule } from './recipe-details/recipe-details.module';
+import { RecipeIngredientsModule } from '@/recipe-ingredients/recipe-ingredients.module';
 import { RecipesModule } from './recipes/recipes.module';
 import { Recipes } from './recipes/recipes';
 import { Ingredients } from './ingredients/ingredients';
-import { RecipeDetails } from './recipe-details/recipe-details';
+import { RecipeIngredients } from '@/recipe-ingredients/recipe-ingredients';
 import { OrderDetails } from './order-details/order-details';
 import { Orders } from './orders/orders';
 import { OrderDetailsModule } from './order-details/order-details.module';
@@ -32,11 +32,11 @@ import { OrderDetailsModule } from './order-details/order-details.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       entities: [
-        EmpCredentials,
-        EmpInfo,
+        UserCredentials,
+        UserInfo,
         Recipes,
         Ingredients,
-        RecipeDetails,
+        RecipeIngredients,
         OrderDetails,
         Orders,
       ], // __dirname: Node.js global var that refers to the directory
@@ -48,10 +48,10 @@ import { OrderDetailsModule } from './order-details/order-details.module';
       /** synchronize: true should only be used in development. If used in production, this can lead to unexpected
        *                data loss or schema changes **/
     }),
-    EmpCredentialsModule,
-    EmpInfoModule,
+    UserCredentialsModule,
+    UserInfoModule,
     AuthModule,
-    RecipeDetailsModule,
+    RecipeIngredientsModule,
     RecipesModule,
     OrderDetailsModule,
   ],

@@ -1,80 +1,29 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { EmpCredentials } from '../emp-credentials/emp.credentials';
-import { DataSource, Repository } from 'typeorm';
-import { EmpInfo } from '../emp-info/emp.info';
+import { UserCredentials } from '@/user-credentials/user-credentials';
+// ------------------------------- Uncomment to start emailing ---------------------------------------------
+// import { UserInfo } from '@/user-info/user-info';
+// -------------------- Look into login and uncomment those lines as well ----------------------------------
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
-import { EmailService } from '../email/email.service';
+import { EmailService } from '@/email/email.service';
+import { Response } from 'express';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(EmpCredentials)
-    private readonly empCredentialsRepository: Repository<EmpCredentials>,
-    @InjectRepository(EmpInfo)
-    private readonly empInfoRepository: Repository<EmpInfo>,
+    @InjectRepository(UserCredentials)
+    private readonly empCredentialsRepository: Repository<UserCredentials>,
 
-    private readonly dataSource: DataSource,
     private readonly jwtService: JwtService,
     private readonly email: EmailService,
   ) {}
 
-  // emp_credential and emp_info are created simultaneously to ensure data synchronicity.
-  async createAuth(
-    username: string,
-    password: string,
-    email: string,
-    firstName: string,
-    lastName: string,
-    userRole: 'worker' | 'admin', // Added userRole parameter to function signature
-  ): Promise<{ success: boolean }> {
-    // Query runner is needed for insert into multiple relations.
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+  // Login and two-factor authentication -------------------------------------------------------------------------
 
-    try {
-      const hashedPassword = await this.hashPassword(password);
-
-      // Create the empCredentials object.
-      const empCredentials = new EmpCredentials();
-      empCredentials.username = username;
-      empCredentials.password = hashedPassword;
-      empCredentials.userRole = userRole; // Set the userRole in empCredentials
-
-      // Create the empInfo object.
-      const empInfo = new EmpInfo();
-      empInfo.username = username;
-      empInfo.f_name = firstName;
-      empInfo.l_name = lastName;
-      empInfo.email = email;
-
-      empCredentials.empInfo = empInfo; // Check if relationship is both ways.
-
-      // Save empCredentials first, then save the relation holding the foreign key.
-      await queryRunner.manager.save(empCredentials);
-      await queryRunner.manager.save(empInfo);
-
-      // Commit the transactions to the database.
-      await queryRunner.commitTransaction();
-
-      // Transaction is successful at this point, return true.
-      return { success: true };
-    } catch (error) {
-      // Rollback transaction if transaction was unsuccessful.
-      await queryRunner.rollbackTransaction();
-      throw new InternalServerErrorException('Failed to create user');
-    } finally {
-      // Release the connection back to connection pool.
-      await queryRunner.release();
-    }
-  }
+  // Login -------------------
 
   async login(
     username: string,
@@ -94,8 +43,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid login');
     }
 
-    const authCode = await this.genTwoFactorCode(); // Generate authentication code.
-    empCredentials.twoFactorCode = authCode;
+    // Generate authentication code.
+    empCredentials.twoFactorCode = await this.genTwoFactorCode();
     empCredentials.twoFactorCodeExpires = new Date(Date.now() + 30 * 60 * 1000); // Code expires in thirty minutes.
     await this.empCredentialsRepository.save(empCredentials); // Save the authentication code and expiration date.
 
@@ -104,19 +53,23 @@ export class AuthService {
     if (!empInfo) {
       throw new UnauthorizedException('User information not found.');
     }
-
-    const subject = `Authentication Code`; // Subject: authentication code
-    const text = `Hello, ${empInfo.f_name}, this is your authentication code:
-    ${authCode}`; // Personalized message for the authentication code.
-    await this.email.sendEmail(empInfo.email, subject, text);
-
+    // Uncomment these lines to receive emails.
+    // -----------------------------------------------------------------
+    // const subject = `Authentication Code`; // Subject: authentication code
+    // const text = `Hello, ${empInfo.f_name}, this is your authentication code:
+    // ${authCode}`; // Personalized message for the authentication code.
+    // await this.email.sendEmail(empInfo.email, subject, text);
+    // -----------------------------------------------------------------
     return { waitingForCode: true };
   }
+
+  // Two-factor authentication.
 
   async verifyAuthCode(
     username: string,
     authCode: string,
-  ): Promise<{ accessToken: string }> {
+    res: Response,
+  ): Promise<{ success: boolean }> {
     const empCredentials = await this.empCredentialsRepository.findOne({
       where: { username: username },
     });
@@ -140,7 +93,22 @@ export class AuthService {
     };
     const accessToken = await this.generateToken(payload);
 
-    return { accessToken };
+    res.cookie('jwt', accessToken, {
+      httpOnly: true,
+      maxAge: 3600000,
+      sameSite: 'strict',
+    });
+
+    res.json({ success: true });
+    return { success: true };
+  }
+
+  // Validate user by returning roles from a JWT cookie.
+  async getRolesFromCookie(token: string): Promise<string[]> {
+    try {
+      const decoded = this.jwtService.verify(token);
+      return decoded.roles;
+    }
   }
 
   // Receive a payload; sign that payload and return a jwt token.
@@ -151,15 +119,9 @@ export class AuthService {
   // Compare this password to the hashed password from this employee object.
   private async matchPassword(
     plaintext: string,
-    employee: EmpCredentials,
+    employee: UserCredentials,
   ): Promise<boolean> {
     return bcrypt.compare(plaintext, employee.password);
-  }
-
-  // Hash a plaintext password with salt rounds: 10.
-  private async hashPassword(password: string): Promise<string> {
-    const salt = 10;
-    return await bcrypt.hash(password, salt);
   }
 
   // Generate a two-factor authentication code.

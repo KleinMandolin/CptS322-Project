@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Post,
+  Res,
   UnauthorizedException,
   UsePipes,
   ValidationPipe,
@@ -11,6 +12,7 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { CreateLoginDto } from './dto/create-login.dto';
 import { CreateSecondFactorDto } from './dto/create-second-factor.dto';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -56,14 +58,18 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   async verifyTwoFactor(
     @Body() createSecondFactorDto: CreateSecondFactorDto,
-  ): Promise<{ accessToken: string }> {
+    @Res() res: Response,
+  ): Promise<{ void }> {
     try {
-      return await this.authService.verifyAuthCode(
+      const result = await this.authService.verifyAuthCode(
         createSecondFactorDto.username,
         createSecondFactorDto.code,
+        res,
       );
+      res.send(result);
+      return;
     } catch (error) {
-      throw new UnauthorizedException(error.message);
+      res.status(401).send({ message: error.message });
     }
   }
 }

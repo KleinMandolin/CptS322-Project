@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EmpCredentials } from './emp.credentials';
+import { UserCredentials } from './user-credentials';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class EmpCredentialsService {
+export class UserCredentialsService {
   constructor(
-    @InjectRepository(EmpCredentials)
-    private readonly empCredentialsRepository: Repository<EmpCredentials>,
+    @InjectRepository(UserCredentials)
+    private readonly empCredentialsRepository: Repository<UserCredentials>,
   ) {}
 
   // If the employee exists, then compare the hashed password with the plaintext.

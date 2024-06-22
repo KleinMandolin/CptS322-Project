@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export const Login = () => {
     const [username, setUsername] = useState('');
@@ -7,30 +8,29 @@ export const Login = () => {
     const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+        event?.preventDefault();
         const backendUrl = import.meta.env.VITE_BACKEND_URL;
-        const response = await fetch(`${backendUrl}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password }),
-        });
+        try {
+            const response = await axios.post(`${backendUrl}/auth/login`,
+                { username, password },
+                { headers: { 'Content-Type': 'application/json' },
+                });
 
-        if (!response.ok) {
-            console.error('Login failed:', response.statusText);
-            alert('Login failed: ' + response.statusText);
-            return;
+            const data = response.data;
+            if (data.waitingForCode) {
+                console.log(data)
+                navigate('login/2fa', { state: { username } });
+            } else {
+                console.log('Login failed: ', data);
+                alert('Login failed')
+            }
+        } catch (error) {
+            // @ts-expect-error: Error will have a response
+            console.error('Login failed:', error.response ? error.response.statusText : error.message);
+            // @ts-expect-error: Error will have a response
+            alert('Login failed: ' + (error.response ? error.response.statusText : error.message));
         }
-
-        const data = await response.json();
-        if (data.waitingForCode) {
-            navigate('/login/2fa', { state: { username } }); // Navigate to the 2FA page with username
-        } else {
-            console.log('Login failed:', data); // Handle login failure
-            alert('Login failed'); // Optionally show an error message
-        }
-    };
+    }
 
     return (
         <div>

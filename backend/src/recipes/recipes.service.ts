@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { InjectRepository } from '@nestjs/typeorm';
 import { Recipes } from './recipes';
 import { Repository } from 'typeorm';
-import { CreateRecipeDto } from '../recipe-details/dto/create-recipe-dto';
+import { CreateRecipeDto } from '@/recipe-ingredients/dto/create-recipe-dto';
 
 @Injectable()
 export class RecipesService {

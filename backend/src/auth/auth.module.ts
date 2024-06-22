@@ -4,9 +4,9 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { EmpCredentials } from '../emp-credentials/emp.credentials';
-import { EmpInfo } from '../emp-info/emp.info';
-import { EmailService } from '../email/email.service';
+import { UserCredentials } from '@/user-credentials/user-credentials';
+import { UserInfo } from '@/user-info/user-info';
+import { EmailService } from '@/email/email.service';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { EmailService } from '../email/email.service';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([EmpCredentials, EmpInfo]),
+    TypeOrmModule.forFeature([UserCredentials, UserInfo]),
   ],
   providers: [AuthService, EmailService],
   controllers: [AuthController],

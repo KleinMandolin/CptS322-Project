@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EmpInfo } from './emp.info';
+import { UserInfo } from './user-info';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class EmpInfoService {
+export class UserInfoService {
   constructor(
-    @InjectRepository(EmpInfo)
-    private readonly empInfoRepository: Repository<EmpInfo>,
+    @InjectRepository(UserInfo)
+    private readonly empInfoRepository: Repository<UserInfo>,
   ) {}
 
   async containsInfo(username: string): Promise<boolean> {
@@ -18,7 +18,7 @@ export class EmpInfoService {
     );
   }
 
-  async getInfo(username: string): Promise<EmpInfo> {
+  async getInfo(username: string): Promise<UserInfo> {
     return this.empInfoRepository.findOne({
       where: { username: username },
     });
