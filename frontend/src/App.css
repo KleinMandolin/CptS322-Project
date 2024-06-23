@@ -18,5 +18,5 @@ button {
   display: grid;
 }
 button:hover {
-  filter: drop-shadow(0 0 1em #646cffaa);
+  filter: drop-shadow(0 0 1em lightcoral);
 }

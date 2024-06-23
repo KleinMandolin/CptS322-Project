@@ -50,6 +50,27 @@ button {
   }
 }
 
+.login {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+}
+
+.login-entries {
+  display: center;
+  text-align: right;
+}
+
+.form-button-holder {
+  padding: 2em;
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  -ms-transform: translate(-50%);
+  transform: translate(-50%);
+}
+
 .menu_header {
   position: fixed;
   top: 0;
