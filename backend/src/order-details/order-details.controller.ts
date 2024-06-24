@@ -33,10 +33,4 @@ export class OrderDetailsController {
   ): Promise<GetOrderDetailsDto> {
     return this.orderDetailsService.createOrder(createOrderDto);
   }
-
-  @Get('entre')
-  @Roles(_Role.ADMIN, _Role.EMPLOYEE)
-  async getEntre() {
-
-  }
 }
