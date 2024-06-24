@@ -1,6 +1,7 @@
-import { IsString, IsEmail, Length } from 'class-validator';
+import { IsString, IsEmail, Length, IsEnum } from 'class-validator';
+import { _Role } from '@/user-management/enums/role-enum';
 
-export class CreateAuthDto {
+export class CreateUserDto {
   @IsString()
   @Length(8, 20)
   username: string;
@@ -19,4 +20,7 @@ export class CreateAuthDto {
   @IsString()
   @Length(2, 50)
   lastName: string;
+
+  @IsEnum(_Role)
+  userRole: _Role;
 }

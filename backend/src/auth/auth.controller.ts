@@ -1,68 +1,72 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Post,
+  Req,
+  Res,
   UnauthorizedException,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { CreateLoginDto } from './dto/create-login.dto';
 import { CreateSecondFactorDto } from './dto/create-second-factor.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { CreateLoginDto } from '@/auth/dto/create-login.dto';
+import { UserInfoService } from '@/user-management/services/user-info.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userInfoService: UserInfoService,
+  ) {}
 
-  @Post('register')
-  // Validation pipe scrubs input against defined parameters.
+  @UseGuards(AuthGuard('local'))
   @UsePipes(new ValidationPipe())
-  async register(
-    // Use the CreateAuthDto object for this input.
-    @Body() createAuthDto: CreateAuthDto,
-  ): Promise<{ success: boolean }> {
-    try {
-      return await this.authService.createAuth(
-        createAuthDto.username,
-        createAuthDto.password,
-        createAuthDto.email,
-        createAuthDto.firstName,
-        createAuthDto.lastName,
-      );
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
   @Post('login')
-  @UsePipes(new ValidationPipe())
   async login(
     @Body() createLoginDto: CreateLoginDto,
-  ): Promise<{ waitingForCode: boolean }> {
-    try {
-      return await this.authService.login(
-        createLoginDto.username,
-        createLoginDto.password,
-      );
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+    @Res() res: any,
+    @Req() req: any,
+  ): Promise<{ success: boolean }> {
+    const userInfo = await this.userInfoService.getInfo(req.username);
+    res.cookie('otp_token', await this.authService.generateOtpToken(userInfo), {
+      httpOnly: true,
+      maxAge: 300000,
+      sameSite: 'strict',
+      secure: true,
+    });
+    return res.status(202).send({
+      success: true,
+    });
   }
 
-  @Post('verify2fa')
+  @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  async verifyTwoFactor(
+  @Post('verify-otp')
+  async secondFactor(
     @Body() createSecondFactorDto: CreateSecondFactorDto,
-  ): Promise<{ accessToken: string }> {
-    try {
-      return await this.authService.verifyAuthCode(
-        createSecondFactorDto.username,
-        createSecondFactorDto.code,
-      );
-    } catch (error) {
-      throw new UnauthorizedException(error.message);
+    @Res() res: any,
+    @Req() req: any,
+  ): Promise<{ success: boolean }> {
+    // Username will be saved client-side.
+    const token = await this.authService.verifyOtp(
+      req.sub,
+      createSecondFactorDto.code,
+    );
+    if (!token) {
+      throw new UnauthorizedException('Incorrect or expired OTP');
     }
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      maxAge: 1800000,
+      sameSite: 'strict',
+      secure: true,
+    });
+
+    res.clearCookie('otp_token');
+
+    return res.status(200).send({ success: true });
   }
 }

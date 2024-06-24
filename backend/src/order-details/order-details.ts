@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Recipes } from '../recipes/recipes';
-import { Orders } from '../orders/orders';
+import { Recipes } from '@/recipes/recipes';
+import { Orders } from '@/orders/orders';
 
 @Entity()
 export class OrderDetails {
@@ -13,13 +13,9 @@ export class OrderDetails {
   @Column({ nullable: false })
   qty: number;
 
-  @ManyToOne(() => Orders, (order) => order.orderDetails, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Orders, (order) => order.orderDetails)
   order: Orders;
 
-  @ManyToOne(() => Recipes, (recipe) => recipe.orderDetails, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Recipes, (recipe) => recipe.orderDetails)
   recipe: Recipes;
 }

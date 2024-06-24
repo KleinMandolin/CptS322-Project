@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Recipes } from '../recipes/recipes';
-import { RecipeDetails } from './recipe-details';
+import { RecipeIngredients } from './recipe-ingredients';
 import { IngredientsService } from '../ingredients/ingredients.service';
 import { RecipesService } from '../recipes/recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe-dto';
@@ -10,17 +10,17 @@ import { GetRecipeDetailsDto } from './dto/get-recipe-details.dto';
 import { GetIngredientQuantityDto } from './dto/get-ingredient-quantity.dto';
 
 @Injectable()
-export class RecipeDetailsService {
+export class RecipeIngredientsService {
   constructor(
     @InjectRepository(Recipes)
     private readonly recipesRepository: Repository<Recipes>,
-    @InjectRepository(RecipeDetails)
-    private readonly recipeDetailsRepository: Repository<RecipeDetails>,
+    @InjectRepository(RecipeIngredients)
+    private readonly recipeDetailsRepository: Repository<RecipeIngredients>,
     private readonly ingredientsService: IngredientsService,
     private readonly recipesService: RecipesService,
   ) {}
 
-  async getRecipesDetails(): Promise<RecipeDetails[]> {
+  async getRecipesDetails(): Promise<RecipeIngredients[]> {
     return await this.recipeDetailsRepository.find();
   }
 

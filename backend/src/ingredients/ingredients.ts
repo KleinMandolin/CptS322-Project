@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToMany, PrimaryColumn } from 'typeorm';
-import { RecipeDetails } from '../recipe-details/recipe-details';
+import { RecipeIngredients } from '@/recipe-ingredients/recipe-ingredients';
 
 @Entity()
 export class Ingredients {
@@ -10,6 +10,9 @@ export class Ingredients {
   qty: number;
 
   // Many-to-many relationship; for many ingredients, we have many corresponding ids in the recipeDetails.
-  @ManyToMany(() => RecipeDetails, (recipeDetails) => recipeDetails.ingredient)
-  recipeDetails: RecipeDetails[];
+  @ManyToMany(
+    () => RecipeIngredients,
+    (recipeDetails) => recipeDetails.ingredient,
+  )
+  recipeDetails: RecipeIngredients[];
 }
