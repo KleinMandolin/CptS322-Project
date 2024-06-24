@@ -1,123 +1,133 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { UserCredentials } from '@/user-credentials/user-credentials';
 // ------------------------------- Uncomment to start emailing ---------------------------------------------
-// import { UserInfo } from '@/user-info/user-info';
+// import { UserInfo } from '@/user-info/user-info'; // <==================================
+// import { EmailService } from '@/email/email.service';
 // -------------------- Look into login and uncomment those lines as well ----------------------------------
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
-import { EmailService } from '@/email/email.service';
-import { Response } from 'express';
 import { Repository } from 'typeorm';
+import { UserCredentials } from '@/user-management/entities/user-credentials';
+import { UserInfoService } from '@/user-management/services/user-info.service';
+import { UserInfo } from '@/user-management/entities/user-info';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserCredentials)
-    private readonly empCredentialsRepository: Repository<UserCredentials>,
-
+    private readonly userCredentialsRepository: Repository<UserCredentials>,
     private readonly jwtService: JwtService,
-    private readonly email: EmailService,
+    private readonly userInfoService: UserInfoService,
+    // Uncomment for the email service. <============================
+    // private readonly email: EmailService,
   ) {}
 
   // Login and two-factor authentication -------------------------------------------------------------------------
 
   // Login -------------------
-
-  async login(
+  async validateUser(
     username: string,
     password: string,
-  ): Promise<{ waitingForCode: boolean }> {
+  ): Promise<UserCredentials> {
     // Get the employee's credentials.
-    const empCredentials = await this.empCredentialsRepository.findOne({
+    const userCredentials = await this.userCredentialsRepository.findOne({
       where: { username: username },
-      relations: ['empInfo'], // Load the empInfo relation for easy data access.
+      relations: ['userInfo'], // Load the userInfo relation for easy data access.
     });
-    // Send vague messages if user credentials don't match up.
-    if (!empCredentials) {
-      throw new UnauthorizedException('Invalid login');
+
+    if (!userCredentials) {
+      throw new UnauthorizedException('Username or password incorrect');
+    } else if (
+      !(await this.comparePassPlainToHash(password, userCredentials))
+    ) {
+      throw new InternalServerErrorException(
+        'Cannot obtain the email associated with this user',
+      );
     }
 
-    if (!(await this.matchPassword(password, empCredentials))) {
-      throw new UnauthorizedException('Invalid login');
-    }
+    await this.sendOtp(userCredentials);
 
+    return userCredentials;
+  }
+
+  // Send OTP for two-factor auth.
+  async sendOtp(
+    userCredentials: UserCredentials,
+  ): Promise<{ success: boolean }> {
     // Generate authentication code.
-    empCredentials.twoFactorCode = await this.genTwoFactorCode();
-    empCredentials.twoFactorCodeExpires = new Date(Date.now() + 30 * 60 * 1000); // Code expires in thirty minutes.
-    await this.empCredentialsRepository.save(empCredentials); // Save the authentication code and expiration date.
+    userCredentials.twoFactorCode = await this.genTwoFactorCode();
+    userCredentials.twoFactorCodeExpires = new Date(
+      Date.now() + 30 * 60 * 1000,
+    ); // Code expires in thirty minutes.
+    await this.userCredentialsRepository.save(userCredentials); // Save the authentication code and expiration date.
 
     // Get personal info for email.
-    const empInfo = empCredentials.empInfo;
-    if (!empInfo) {
-      throw new UnauthorizedException('User information not found.');
+    const userInfo = userCredentials.userInfo;
+    if (!userInfo) {
+      throw new InternalServerErrorException('User information not found.');
     }
     // Uncomment these lines to receive emails.
     // -----------------------------------------------------------------
     // const subject = `Authentication Code`; // Subject: authentication code
-    // const text = `Hello, ${empInfo.f_name}, this is your authentication code:
+    // const text = `Hello, ${userInfo.f_name}, this is your authentication code: // <================================
     // ${authCode}`; // Personalized message for the authentication code.
-    // await this.email.sendEmail(empInfo.email, subject, text);
+    // await this.email.sendEmail(userInfo.email, subject, text);
     // -----------------------------------------------------------------
-    return { waitingForCode: true };
+
+    return { success: true };
   }
 
   // Two-factor authentication.
 
-  async verifyAuthCode(
-    username: string,
-    authCode: string,
-    res: Response,
-  ): Promise<{ success: boolean }> {
-    const empCredentials = await this.empCredentialsRepository.findOne({
+  async verifyOtp(username: string, authCode: string): Promise<string> {
+    const userCredentials = await this.userCredentialsRepository.findOne({
       where: { username: username },
     });
-    // Throw an exception if the entered authCode is not the generated authCode.
-    // Throw an exception if the authCode has expired.
     if (
-      empCredentials.twoFactorCode !== authCode ||
-      empCredentials.twoFactorCodeExpires < new Date()
+      userCredentials.twoFactorCode !== authCode ||
+      userCredentials.twoFactorCodeExpires < new Date()
     ) {
-      throw new UnauthorizedException('Invalid or expired auth code.');
+      throw new UnauthorizedException('Invalid or expired OTP');
     }
 
-    empCredentials.twoFactorCode = null;
-    empCredentials.twoFactorCodeExpires = null;
-    await this.empCredentialsRepository.save(empCredentials);
+    userCredentials.twoFactorCode = null;
+    userCredentials.twoFactorCodeExpires = null;
+    await this.userCredentialsRepository.save(userCredentials);
+    return await this.generateToken(userCredentials);
+  }
 
-    // Include userRole in the token payload to utilize it for role-based access control in the application.
+  private async generateToken(
+    userCredentials: UserCredentials,
+  ): Promise<string> {
+    // Put the user roles into a payload.
+    const userInfo = await this.userInfoService.getInfo(
+      userCredentials.username,
+    );
     const payload = {
-      sub: empCredentials.username,
-      role: empCredentials.userRole,
+      sub: userCredentials.username,
+      roles: userInfo.userRole,
+      iat: Math.floor(Date.now() / 1000), // Add timestamps to the cookies to reduce the risk of reuse
     };
-    const accessToken = await this.generateToken(payload);
-
-    res.cookie('jwt', accessToken, {
-      httpOnly: true,
-      maxAge: 3600000,
-      sameSite: 'strict',
-    });
-
-    res.json({ success: true });
-    return { success: true };
-  }
-
-  // Validate user by returning roles from a JWT cookie.
-  async getRolesFromCookie(token: string): Promise<string[]> {
-    try {
-      const decoded = this.jwtService.verify(token);
-      return decoded.roles;
-    }
-  }
-
-  // Receive a payload; sign that payload and return a jwt token.
-  async generateToken(payload: any): Promise<string> {
     return this.jwtService.sign(payload);
   }
 
+  async validateCookiePayload(payload: any): Promise<UserInfo> {
+    const userInfo = await this.userInfoService.getInfo(payload.sub);
+    if (!userInfo) {
+      throw new UnauthorizedException('This is a protected route');
+    }
+
+    // Return userInfo object for middleware access to roles.
+    return userInfo;
+  }
+
   // Compare this password to the hashed password from this employee object.
-  private async matchPassword(
+  private async comparePassPlainToHash(
     plaintext: string,
     employee: UserCredentials,
   ): Promise<boolean> {

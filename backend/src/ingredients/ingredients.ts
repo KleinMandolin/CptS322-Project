@@ -10,6 +10,9 @@ export class Ingredients {
   qty: number;
 
   // Many-to-many relationship; for many ingredients, we have many corresponding ids in the recipeDetails.
-  @ManyToMany(() => RecipeIngredients, (recipeDetails) => recipeDetails.ingredient)
+  @ManyToMany(
+    () => RecipeIngredients,
+    (recipeDetails) => recipeDetails.ingredient,
+  )
   recipeDetails: RecipeIngredients[];
 }

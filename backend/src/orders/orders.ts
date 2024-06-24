@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { OrderDetails } from '../order-details/order-details';
+import { OrderDetails } from '@/order-details/order-details';
 
 @Entity()
 export class Orders {

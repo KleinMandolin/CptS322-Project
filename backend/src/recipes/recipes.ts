@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { RecipeIngredients } from '@/recipe-ingredients/recipe-ingredients';
-import { OrderDetails } from '../order-details/order-details';
+import { OrderDetails } from '@/order-details/order-details';
 
 @Entity()
 export class Recipes {
@@ -11,9 +11,9 @@ export class Recipes {
   price: number;
 
   @Column({
-    type: "enum",
-    enum: ["appetizer", "main_course", "dessert", "beverage"],
-    default: "main_course"
+    type: 'enum',
+    enum: ['appetizer', 'main_course', 'dessert', 'beverage'],
+    default: 'main_course',
   })
   mealType: 'appetizer' | 'main_course' | 'dessert' | 'beverage';
 
