@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -47,6 +46,13 @@ export class UserManagementService {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  async getCredentialAndInfo(username: string): Promise<UserCredentials> {
+    return await this.userCredentialsRepository.findOne({
+      where: { username: username },
+      relations: ['userInfo'], // Load the userInfo relation for easy data access.
+    });
   }
 
   private async hashPassword(password: string) {

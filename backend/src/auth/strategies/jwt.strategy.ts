@@ -1,9 +1,14 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '@/auth/auth.service';
-import { UserInfo } from '@/user-management/entities/user-info';
+import { _Role } from '@/user-management/enums/role-enum';
+import { UserCredentialsService } from '@/user-management/services/user-credentials.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -11,6 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
+    private readonly userCredentialsService: UserCredentialsService,
   ) {
     // Extract the JWT token from the cookie, end session if cookie expires, pass the jwt secret to the parent constructor.
     super({
@@ -21,11 +27,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   // Get a userInfo entity from the decoded payload's json and return it for further use in other guards.
-  async validate(payload: any): Promise<UserInfo> {
-    const user = await this.authService.validateCookiePayload(payload);
-    if (!user) {
+  async validate(payload: any): Promise<{ userRole: _Role; username: string }> {
+    const userRole = payload.role;
+    const usernameInCookie = payload.sub;
+
+    if (!(await this.userCredentialsService.findUser(usernameInCookie))) {
+      throw new ForbiddenException('Jwt has been manipulated');
+    }
+
+    if (!usernameInCookie) {
       throw new UnauthorizedException('This is a protected path');
     }
-    return user;
+    return { userRole: userRole, username: usernameInCookie };
   }
 }

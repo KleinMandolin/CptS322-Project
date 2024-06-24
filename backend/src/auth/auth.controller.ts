@@ -2,43 +2,59 @@ import {
   Body,
   Controller,
   Post,
+  Req,
+  Res,
+  UnauthorizedException,
   UseGuards,
   UsePipes,
   ValidationPipe,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateSecondFactorDto } from './dto/create-second-factor.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateLoginDto } from '@/auth/dto/create-login.dto';
-import { GetResponse } from '@/auth/decorators/get-response.decorator';
+import { UserInfoService } from '@/user-management/services/user-info.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userInfoService: UserInfoService,
+  ) {}
 
   @UseGuards(AuthGuard('local'))
+  @UsePipes(new ValidationPipe())
   @Post('login')
   async login(
     @Body() createLoginDto: CreateLoginDto,
+    @Res() res: any,
+    @Req() req: any,
   ): Promise<{ success: boolean }> {
-    const { username, password } = createLoginDto;
-
-    if (!(await this.authService.validateUser(username, password))) {
-      throw new UnauthorizedException('Username or password invalid');
-    }
-    return { success: true };
+    const userInfo = await this.userInfoService.getInfo(req.username);
+    res.cookie('otp_token', await this.authService.generateOtpToken(userInfo), {
+      httpOnly: true,
+      maxAge: 300000,
+      sameSite: 'strict',
+      secure: true,
+    });
+    return res.status(202).send({
+      success: true,
+    });
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   @Post('verify-otp')
   async secondFactor(
     @Body() createSecondFactorDto: CreateSecondFactorDto,
-    @GetResponse() res,
+    @Res() res: any,
+    @Req() req: any,
   ): Promise<{ success: boolean }> {
     // Username will be saved client-side.
-    const { username, code } = createSecondFactorDto;
-    const token = await this.authService.verifyOtp(username, code);
+    const token = await this.authService.verifyOtp(
+      req.sub,
+      createSecondFactorDto.code,
+    );
     if (!token) {
       throw new UnauthorizedException('Incorrect or expired OTP');
     }
@@ -46,8 +62,11 @@ export class AuthController {
       httpOnly: true,
       maxAge: 1800000,
       sameSite: 'strict',
+      secure: true,
     });
 
-    return { success: true };
+    res.clearCookie('otp_token');
+
+    return res.status(200).send({ success: true });
   }
 }

@@ -34,8 +34,14 @@ export class UserInfoService {
   }
 
   async getInfo(username: string): Promise<UserInfo> {
-    return this.empInfoRepository.findOne({
+    const userInfo = await this.empInfoRepository.findOne({
       where: { username: username },
     });
+
+    if (!userInfo) {
+      throw new BadRequestException('User does not exist');
+    }
+
+    return userInfo;
   }
 }
