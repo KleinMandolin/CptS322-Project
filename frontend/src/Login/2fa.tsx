@@ -53,6 +53,7 @@ export const TwoFactorAuth = () => {
         <div>
           <label>Code: </label>
           <input
+            required
             type="text"
             value={code}
             onChange={(e) => setCode(e.target.value)}

@@ -80,13 +80,21 @@ button {
   background-color: lightcoral;
   z-index: 1000;
   justify-content: space-between;
+  align-items: center;
   display: flex;
   font-size: 0.75em;
 }
 
+.categoryButtons {
+  gap: 0.25em;
+  display: flex;
+  flex-direction: row;
+  scale: 80%;
+}
+
 .sidebar {
   z-index: 999;
-  padding: 8px;
+
   background-color: rgb(255, 201, 201);
   color: black;
   position: fixed;
@@ -95,7 +103,7 @@ button {
   top: 4em;
   bottom: 0;
   right: -16em;
-  width: 14em;
+  width: 15em;
   -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
   -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
   -o-transition: opacity 0.3s linear, right 0.3s ease-out;
@@ -108,6 +116,48 @@ button {
   -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
   -o-transition: opacity 0.3s linear, right 0.3s ease-out;
   transition: opacity 0.3s linear, right 0.3s ease-out;
+}
+
+.cartItems {
+  margin-bottom: 4.5em;
+  margin-left: -0.75em;
+}
+
+.cartItemEntry {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 0.6em;
+  padding: 0.25em;
+}
+
+.recieptLine {
+  width: 6em;
+}
+
+.footer {
+  background-color: lightcoral;
+  width: 15em;
+  height: 4em;
+  position: fixed;
+  bottom: 0;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.checkoutButton {
+  margin-right: -1em;
+  scale: 60%;
+}
+
+.checkoutButton:hover {
+  filter: drop-shadow(0 0 1em rgb(255, 255, 255));
+}
+
+.cartTotal {
+  margin-left: 2em;
 }
 
 .menu {
@@ -123,7 +173,7 @@ button {
 .menuItem {
   display: grid;
   gap: 1rem 1rem;
-  max-width: 35rem;
+  max-width: 35em;
 }
 
 .menuButton {

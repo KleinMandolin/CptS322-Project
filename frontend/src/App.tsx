@@ -11,7 +11,7 @@ import './App.css';
 export const AppRouter = () => (
   <Router>
     <Routes>
-      <Route path="/" Component={Login} />
+      <Route path="/" Component={Menu} />
       <Route path="/login/2fa" Component={TwoFactorAuth} />
       <Route path="/menu" Component={Menu} />
     </Routes>

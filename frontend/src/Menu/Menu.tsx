@@ -11,6 +11,9 @@ class Menu extends React.Component<any, any> {
       fullmenu: null, // formatting of menu
       cart: {}, // shopping cart dictionary cart[id]={name, price, count}
       sidebarOpen: false,
+      total: 0.0,
+      category: 'all',
+      checkout: false,
     };
     this.populate = this.populate.bind(this);
   }
@@ -37,19 +40,21 @@ class Menu extends React.Component<any, any> {
   }
 
   // increments given item count in shopping cart
-  incrCount(id) {
+  incrCount(item) {
     // originally
     //  this.state.cart[id].count = this.state.cart[id].count + 1;
     // but to trigger rerender, setState is needed, and individual dict
     // items cannot be edited via setState, so entire dict is copied
     // code from: https://forum.freecodecamp.org/t/reactjs-using-setstate-to-update-a-single-property-on-an-object/146772/2
     const cartCopy = JSON.parse(JSON.stringify(this.state.cart));
-    cartCopy[id].count = cartCopy[id].count + 1;
+    cartCopy[item].count = cartCopy[item].count + 1;
     this.setState({
       cart: cartCopy,
+      total: this.state.total + cartCopy[item].price,
     });
   }
 
+  // renders live cart
   showOrders() {
     if (this.isEmpty(this.state.cart)) {
       return <p>Loading</p>;
@@ -59,22 +64,71 @@ class Menu extends React.Component<any, any> {
       const data = this.state.cart;
       return (
         <div className="menuCart">
-          <ul>
+          <ul className="cartItems">
             {Object.keys(data).map((key) => {
               if (data[key].count > 0) {
                 return (
-                  <li>
-                    {data[key].count}x {data[key].name}
-                  </li>
+                  <>
+                    <li>
+                      <div className="cartItemEntry">
+                        <div className="cartItemCount">
+                          {data[key].count}x {data[key].name}
+                        </div>
+                        <div className="cartItemCharge">
+                          ${(data[key].count * data[key].price).toFixed(2)}
+                        </div>
+                      </div>
+                    </li>
+                    <hr className="recieptLine" />
+                  </>
                 );
               }
             })}
           </ul>
+          <div className="footer">
+            <div className="cartTotal">${this.state.total.toFixed(2)}</div>
+            <button className="checkoutButton" onClick={() => this.checkout()}>
+              Checkout
+            </button>
+          </div>
         </div>
       );
     }
   }
 
+  // renders fullmenu
+  showMenu() {
+    return (
+      <div className="menu">
+        {this.state.fullmenu.map((menuItem) => {
+          const { item_name, cost, description } = menuItem;
+          if (
+            this.state.category === 'all' ||
+            menuItem.category === this.state.category
+          )
+            return (
+              <article key={item_name} className="menuItem">
+                <button
+                  key={item_name}
+                  className="menuButton"
+                  onClick={() => this.incrCount(item_name)}
+                >
+                  {item_name}
+                </button>
+                <div className="itemInfo">
+                  <header>
+                    <h4 className="cost">${cost}</h4>
+                  </header>
+                  <p className="description">{description}</p>
+                </div>
+              </article>
+            );
+        })}
+      </div>
+    );
+  }
+
+  // on component mount, fetches menu json and inits values
   populate() {
     fetch('/testmenu.json', { method: 'GET' }) // url to access, GET call
       .then(async (response) => {
@@ -92,10 +146,10 @@ class Menu extends React.Component<any, any> {
         if (this.isEmpty(this.state.cart)) {
           {
             data.map((menuItem) => {
-              const { id, item_name, cost } = menuItem;
-              this.state.cart[id] = {
+              const { item_name, cost } = menuItem;
+              this.state.cart[item_name] = {
                 name: item_name,
-                price: cost,
+                price: parseFloat(cost),
                 count: 0,
               };
             });
@@ -104,36 +158,61 @@ class Menu extends React.Component<any, any> {
 
         // create frontend menu layout
         this.setState({
-          fullmenu: (
-            <div className="menu">
-              {data.map((menuItem) => {
-                const { id, item_name, cost, description } = menuItem;
-                return (
-                  <article key={id} className="menuItem">
-                    <button
-                      key={item_name}
-                      className="menuButton"
-                      onClick={() => this.incrCount(id)}
-                    >
-                      {item_name}
-                    </button>
-                    <div className="itemInfo">
-                      <header>
-                        <h4 className="cost">${cost}</h4>
-                      </header>
-                      <p className="description">{description}</p>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          ),
+          fullmenu: data,
         });
       })
       .catch((error) => {
         this.setState({ errorMessage: error.toString() });
         console.error('Error in get count.', error);
       });
+  }
+
+  // converts shopping cart to json format, getting rid of empty
+  // (count=0) values
+  checkout() {
+    const cart = this.state.cart;
+    // maps specific json format from cart (cart contains price, unnecessary for backend reciept)
+    const wholeCart = Object.entries(cart).map(([key, value]) => {
+      if (cart[key].count > 0) {
+        return {
+          recipeName: cart[key].name,
+          qty: cart[key].count,
+        };
+      }
+    });
+
+    // if count of an item == 0, it was replaced with null
+    // which is the filtered using code from here:
+    // https://stackoverflow.com/questions/61382447/filter-out-null-value-from-array-in-react
+    const filteredCart = wholeCart.filter((q) => !!q);
+
+    // add item to total json file
+    const order = {
+      orderDetails: filteredCart,
+    };
+
+    console.log(JSON.stringify(order));
+
+    /* Output should look like:
+    
+      {
+        "orderDetails": [
+          {
+            "recipeName": "Spaghetti Bolognese",
+            "qty": 2
+          },
+          {
+            "recipeName": "Chicken Caesar Salad",
+            "qty": 3
+          },
+          {
+            "recipeName": "Margherita Pizza",
+            "qty": 1
+          }
+        ]
+      }
+
+    */
   }
 
   render() {
@@ -146,6 +225,34 @@ class Menu extends React.Component<any, any> {
             </button>
           </span>
           <span>
+            <div className="categoryButtons">
+              <button
+                className="all"
+                onClick={() => this.setState({ category: 'all' })}
+              >
+                all
+              </button>
+              <button
+                className="drinks"
+                onClick={() => this.setState({ category: 'drink' })}
+              >
+                drinks
+              </button>
+              <button
+                className="appetizers"
+                onClick={() => this.setState({ category: 'appetizer' })}
+              >
+                appetizers
+              </button>
+              <button
+                className="entrees"
+                onClick={() => this.setState({ category: 'entree' })}
+              >
+                entrees
+              </button>
+            </div>
+          </span>
+          <span>
             <button
               className="cart_button"
               onClick={() => this.toggleSidebar()}
@@ -155,10 +262,12 @@ class Menu extends React.Component<any, any> {
           </span>
         </div>
         <SideBar isOpen={this.state.sidebarOpen} data={this.showOrders()} />
-        <div className="menu">{this.state?.fullmenu ?? 'Loading'}</div>
+        <div className="menu">
+          {this.state.fullmenu ? this.showMenu() : 'loading'}
+        </div>
       </>
     );
   }
 }
-
+// {this.state?.fullmenu ?? 'Loading'}
 export default Menu;
