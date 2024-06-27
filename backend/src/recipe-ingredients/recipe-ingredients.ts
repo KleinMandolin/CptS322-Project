@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Recipes } from '../recipes/recipes';
-import { Ingredients } from '../ingredients/ingredients';
+import { Recipes } from '@/recipes/recipes';
+import { Ingredients } from '@/ingredients/ingredients';
 
 @Entity()
-export class RecipeDetails {
+export class RecipeIngredients {
   // Both columns are primary in this case. This indicates a composite key.
   @PrimaryColumn()
   recipeName: string;

@@ -1,168 +1,104 @@
 import {
   Injectable,
-  InternalServerErrorException,
+  InternalServerErrorException, Req,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { EmpCredentials } from '../emp-credentials/emp.credentials';
-import { DataSource, Repository } from 'typeorm';
-import { EmpInfo } from '../emp-info/emp.info';
+// ------------------------------- Uncomment to start emailing ---------------------------------------------
+// import { UserInfo } from '@/user-info/user-info'; // <==================================
+// import { EmailService } from '@/email/email.service';
+// -------------------- Look into login and uncomment those lines as well ----------------------------------
 import * as bcrypt from 'bcrypt';
-import { randomBytes } from 'crypto';
-import { EmailService } from '../email/email.service';
+import { UserInfoService } from '@/user-management/services/user-info.service';
+import { UserInfo } from '@/user-management/entities/user-info';
+import { _Role } from '@/user-management/enums/role-enum';
+import { UserCredentialsService } from '@/user-management/services/user-credentials.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(EmpCredentials)
-    private readonly empCredentialsRepository: Repository<EmpCredentials>,
-    @InjectRepository(EmpInfo)
-    private readonly empInfoRepository: Repository<EmpInfo>,
-
-    private readonly dataSource: DataSource,
+    private readonly userCredentialsService: UserCredentialsService,
     private readonly jwtService: JwtService,
-    private readonly email: EmailService,
+    private readonly userInfoService: UserInfoService,
+    // Uncomment for the email service. <============================
+    // private readonly email: EmailService,
   ) {}
 
-  // emp_credential and emp_info are created simultaneously to ensure data synchronicity.
-  async createAuth(
+  // Login and two-factor authentication -------------------------------------------------------------------------
+
+  // Login -------------------
+  async validateUser(
     username: string,
     password: string,
-    email: string,
-    firstName: string,
-    lastName: string,
   ): Promise<{ success: boolean }> {
-    // Query runner is needed for insert into multiple relations.
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      const hashedPassword = await this.hashPassword(password);
-
-      // Create the empCredentials object.
-      const empCredentials = new EmpCredentials();
-      empCredentials.username = username;
-      empCredentials.password = hashedPassword;
-
-      // Create the empInfo object.
-      const empInfo = new EmpInfo();
-      empInfo.username = username;
-      empInfo.f_name = firstName;
-      empInfo.l_name = lastName;
-      empInfo.email = email;
-
-      empCredentials.empInfo = empInfo; // Check if relationship is both ways.
-
-      // Save empCredentials first, then save the relation holding the foreign key.
-      await queryRunner.manager.save(empCredentials);
-      await queryRunner.manager.save(empInfo);
-
-      // Commit the transactions to the database.
-      await queryRunner.commitTransaction();
-
-      // Transaction is successful at this point, return true.
-      return { success: true };
-    } catch (error) {
-      // Rollback transaction if transaction was unsuccessful.
-      await queryRunner.rollbackTransaction();
-      throw new InternalServerErrorException('Failed to create user');
-    } finally {
-      // Release the connection back to connection pool.
-      await queryRunner.release();
+    // Get the employee's credentials.
+    const user = await this.userCredentialsService.findUser(username);
+    if (!user) {
+      throw new UnauthorizedException('Username or password incorrect');
+    } else if (!(await this.comparePassPlainToHash(password, user.password))) {
+      throw new InternalServerErrorException(
+        'Cannot obtain the email associated with this user',
+      );
     }
+
+    return await this.sendOtp(username);
   }
 
-  async login(
-    username: string,
-    password: string,
-  ): Promise<{ waitingForCode: boolean }> {
-    // Get the employee's credentials.
-    const empCredentials = await this.empCredentialsRepository.findOne({
-      where: { username: username },
-      relations: ['empInfo'], // Load the empInfo relation for easy data access.
-    });
-    // Send vague messages if user credentials don't match up.
-    if (!empCredentials) {
-      throw new UnauthorizedException('Invalid login');
-    }
+  async generateOtpToken(user: UserInfo): Promise<string> {
+    const payload = { sub: user.username, email: user.email, role: null };
+    return this.jwtService.sign(payload, { expiresIn: '5m' });
+  }
 
-    if (!(await this.matchPassword(password, empCredentials))) {
-      throw new UnauthorizedException('Invalid login');
+  // Send OTP for two-factor auth.
+  async sendOtp(username: string): Promise<{ success: boolean }> {
+    if (!(await this.userCredentialsService.wasOtpCreated(username))) {
+      throw new InternalServerErrorException(
+        'Could not create one time password',
+      );
     }
-
-    const authCode = await this.genTwoFactorCode(); // Generate authentication code.
-    empCredentials.twoFactorCode = authCode;
-    empCredentials.twoFactorCodeExpires = new Date(Date.now() + 30 * 60 * 1000); // Code expires in thirty minutes.
-    await this.empCredentialsRepository.save(empCredentials); // Save the authentication code and expiration date.
 
     // Get personal info for email.
-    const empInfo = empCredentials.empInfo;
-    if (!empInfo) {
-      throw new UnauthorizedException('User information not found.');
+    const userInfo = this.userInfoService.getInfo(username);
+    if (!userInfo) {
+      throw new InternalServerErrorException('User information not found.');
     }
+    // Uncomment these lines to receive emails.
+    // -----------------------------------------------------------------
+    // const subject = `Authentication Code`; // Subject: authentication code
+    // const text = `Hello, ${userInfo.f_name}, this is your authentication code: // <================================
+    // ${authCode}`; // Personalized message for the authentication code.
+    // await this.email.sendEmail(userInfo.email, subject, text);
+    // -----------------------------------------------------------------
 
-    const subject = `Authentication Code`; // Subject: authentication code
-    const text = `Hello, ${empInfo.f_name}, this is your authentication code:
-    ${authCode}`; // Personalized message for the authentication code.
-    await this.email.sendEmail(empInfo.email, subject, text);
-
-    return { waitingForCode: true };
+    return { success: true };
   }
 
-  async verifyAuthCode(
-    username: string,
-    authCode: string,
-  ): Promise<{ accessToken: string }> {
-    const empCredentials = await this.empCredentialsRepository.findOne({
-      where: { username: username },
-    });
-    // Throw an exception if the entered authCode is not the generated authCode.
-    // Throw an exception if the authCode has expired.
-    if (
-      empCredentials.twoFactorCode !== authCode ||
-      empCredentials.twoFactorCodeExpires < new Date()
-    ) {
-      throw new UnauthorizedException('Invalid or expired auth code.');
+  // Two-factor authentication.
+
+  async verifyOtp(username: string, authCode: string): Promise<string> {
+    if (!(await this.userCredentialsService.isOtpValid(username, authCode))) {
+      throw new UnauthorizedException('OTP is expired or incorrect');
     }
+    return await this.generateFinalJwtToken(username);
+  }
 
-    // Reset twoFactor auth code fields.
-    empCredentials.twoFactorCode = null;
-    empCredentials.twoFactorCodeExpires = null;
-    await this.empCredentialsRepository.save(empCredentials);
-
-    // sub is the unique identifier of this user. Since username is unique in this system, I used username.
+  private async generateFinalJwtToken(username: string): Promise<string> {
+    // Put the user role into a payload.
+    const userInfo = await this.userInfoService.getInfo(username);
     const payload = {
-      username: empCredentials.username,
-      sub: empCredentials.username,
+      sub: userInfo.username,
+      role: userInfo.userRole,
+      iat: Math.floor(Date.now() / 1000), // Add timestamps to the cookies to reduce the risk of reuse
     };
-    const accessToken = await this.generateToken(payload);
-
-    return { accessToken };
-  }
-
-  // Receive a payload; sign that payload and return a jwt token.
-  async generateToken(payload: any): Promise<string> {
+    console.log(payload);
     return this.jwtService.sign(payload);
   }
 
   // Compare this password to the hashed password from this employee object.
-  private async matchPassword(
+  private async comparePassPlainToHash(
     plaintext: string,
-    employee: EmpCredentials,
+    hashedPass: string,
   ): Promise<boolean> {
-    return bcrypt.compare(plaintext, employee.password);
-  }
-
-  // Hash a plaintext password with salt rounds: 10.
-  private async hashPassword(password: string): Promise<string> {
-    const salt = 10;
-    return await bcrypt.hash(password, salt);
-  }
-
-  // Generate a two-factor authentication code.
-  private async genTwoFactorCode(): Promise<string> {
-    return randomBytes(3).toString('hex');
+    return bcrypt.compare(plaintext, hashedPass);
   }
 }

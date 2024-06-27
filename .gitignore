@@ -4,6 +4,7 @@
 
 # Node modules
 /backend/node_modules
+/node_modules
 
 # Logs
 /backend/logs
@@ -62,7 +63,7 @@ lerna-debug.log*
 /frontend/yarn-error.log*
 /frontend/pnpm-debug.log*
 /frontend/lerna-debug.log*
-
+/backend/node_modules
 /frontend/node_modules
 /frontend/dist
 /frontend/dist-ssr
