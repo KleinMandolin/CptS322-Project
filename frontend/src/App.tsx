@@ -3,6 +3,8 @@ import { Login } from './Login/Login';
 import { TwoFactorAuth } from './Login/2fa';
 import Launchpad from './Launchpad/Launchpad.tsx';
 import Menu from './Menu/Menu.tsx';
+import Inventory from './Inventory/Inventory.tsx';
+import Revenue from './Revenue/Revenue.tsx';
 
 import './App.css';
 
@@ -15,6 +17,8 @@ export const AppRouter = () => (
       <Route path="/login/2fa" Component={TwoFactorAuth} />
       <Route path="/menu" Component={Menu} />
       <Route path="/launchpad" Component={Launchpad} />
+      <Route path="/inventory" Component={Inventory} />
+      <Route path="/revenue" Component={Revenue} />
     </Routes>
   </Router>
 );
