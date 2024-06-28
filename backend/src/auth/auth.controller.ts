@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Req,
   Res,
@@ -14,12 +15,15 @@ import { CreateSecondFactorDto } from './dto/create-second-factor.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateLoginDto } from '@/auth/dto/create-login.dto';
 import { UserInfoService } from '@/user-management/services/user-info.service';
+import { UserInfo } from '@/user-management/entities/user-info';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userInfoService: UserInfoService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @UseGuards(AuthGuard('local'))
@@ -28,18 +32,38 @@ export class AuthController {
   async login(
     @Body() createLoginDto: CreateLoginDto,
     @Res() res: any,
-    @Req() req: any,
   ): Promise<{ success: boolean }> {
-    const userInfo = await this.userInfoService.getInfo(req.username);
-    res.cookie('otp_token', await this.authService.generateOtpToken(userInfo), {
-      httpOnly: true,
+    const userInfo = await this.userInfoService.getInfo(
+      createLoginDto.username,
+    );
+
+    const otpToken = await this.authService.generateOtpToken(userInfo);
+
+    res.cookie('otp_token', otpToken, {
       maxAge: 300000,
       sameSite: 'strict',
       secure: true,
+      httpOnly: true,
     });
+
     return res.status(202).send({
       success: true,
     });
+  }
+
+  // Test endpoint
+  @Post('test')
+  async test(@Res() res: any): Promise<{ success: boolean }> {
+    console.log('test endpoint hit');
+    return res.json({ success: true });
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('clear-cookies')
+  async logout(@Res() res, @Req() req): Promise<{ success: boolean }> {
+    res.clearCookie('jwt');
+    req.user = null;
+    return res.status(200).send({ success: true });
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -50,19 +74,20 @@ export class AuthController {
     @Res() res: any,
     @Req() req: any,
   ): Promise<{ success: boolean }> {
-    // Username will be saved client-side.
     const token = await this.authService.verifyOtp(
-      req.sub,
+      req.user.sub,
       createSecondFactorDto.code,
     );
     if (!token) {
       throw new UnauthorizedException('Incorrect or expired OTP');
     }
+
+    // Send jwt token.
     res.cookie('jwt', token, {
-      httpOnly: true,
       maxAge: 1800000,
       sameSite: 'strict',
       secure: true,
+      httpOnly: true,
     });
 
     res.clearCookie('otp_token');
