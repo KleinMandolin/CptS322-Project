@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import {  useLocation } from 'react-router-dom';
-import axios from 'axios'
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export const TwoFactorAuth = () => {
     const isErrorWithMessage = (error: unknown): error is { message: string } => {
@@ -8,18 +8,8 @@ export const TwoFactorAuth = () => {
     };
 
     const [code, setCode] = useState('');
-    const location = useLocation();
-    const [username, setUsername] = useState('');
     const [error, setError] = useState('');
-
-    useEffect(() => {
-        // Username is passed via state in the location object from the previous page
-        if (location.state && location.state.username) {
-            setUsername(location.state.username);
-        } else {
-            setError('Username not found. Please try again.');
-        }
-    }, [location.state]);
+    const navigate = useNavigate(); // Initialize the useNavigate hook
 
     // Handle the submission. Declare type for the event - react form element.
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -27,16 +17,15 @@ export const TwoFactorAuth = () => {
         const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
         try {
-            const response = await axios.post(`${backendUrl}/auth/verify2fa`,
-                {username, code},
-                {withCredentials: true}
-            );
-
-            if (response.data.success) {
-                alert('Login Successful')
-            } else {
-                setError('Invalid code. Try again.')
-            }
+            const instance = axios.create({
+                withCredentials: true,
+                baseURL: backendUrl
+            })
+            await instance.post(`/auth/verify-otp`, {
+                code,
+            });
+            // Navigate to the landing page on successful OTP verification
+            navigate('/landing');
         } catch (error: unknown) {
             if (isErrorWithMessage(error))
             setError(`Error: ${error.message}`);
@@ -58,4 +47,3 @@ export const TwoFactorAuth = () => {
         </div>
     );
 };
-
