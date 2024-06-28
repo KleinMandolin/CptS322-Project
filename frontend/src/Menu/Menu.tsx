@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import SideBar from './Sidebar.tsx';
+import { Link } from 'react-router-dom';
 
 import { FaShoppingCart, FaArrowLeft } from 'react-icons/fa';
 
@@ -220,9 +221,11 @@ class Menu extends React.Component<any, any> {
       <>
         <div className="menu_header">
           <span>
-            <button className="return_button">
-              <FaArrowLeft />
-            </button>
+            <Link to="/launchpad">
+              <button className="return_button">
+                <FaArrowLeft />
+              </button>
+            </Link>
           </span>
           <span>
             <div className="categoryButtons">

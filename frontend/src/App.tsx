@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Login } from './Login/Login';
 import { TwoFactorAuth } from './Login/2fa';
-
+import Launchpad from './Launchpad/Launchpad.tsx';
 import Menu from './Menu/Menu.tsx';
 
 import './App.css';
@@ -14,6 +14,7 @@ export const AppRouter = () => (
       <Route path="/" Component={Login} />
       <Route path="/login/2fa" Component={TwoFactorAuth} />
       <Route path="/menu" Component={Menu} />
+      <Route path="/launchpad" Component={Launchpad} />
     </Routes>
   </Router>
 );
