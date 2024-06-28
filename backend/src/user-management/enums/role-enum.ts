@@ -2,4 +2,5 @@
 export enum _Role {
   EMPLOYEE = 'employee',
   ADMIN = 'admin',
+  NONE = 'none',
 }
