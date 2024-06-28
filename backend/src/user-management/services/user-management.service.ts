@@ -1,7 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserCredentials } from '@/user-management/entities/user-credentials';
@@ -24,9 +21,12 @@ export class UserManagementService {
       const { username, password, email, firstName, lastName, userRole } =
         createUserDto;
 
-      if (
-        !(await this.userCredentialsRepository.find({ where: { username } }))
-      ) {
+      const user_exists = await this.arraysEqual(
+        await this.userCredentialsRepository.find({ where: { username } }),
+        [],
+      );
+
+      if (user_exists) {
         const hashedPass = await this.hashPassword(password);
         const userCredentials = this.userCredentialsRepository.create({
           username: username,
@@ -46,6 +46,13 @@ export class UserManagementService {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  private async arraysEqual(arr1: UserCredentials[], arr2: []): Promise<boolean> {
+    if (arr1.length === arr2.length) {
+      return true;
+    }
+    return false;
   }
 
   async getCredentialAndInfo(username: string): Promise<UserCredentials> {

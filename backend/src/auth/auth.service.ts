@@ -1,6 +1,6 @@
 import {
   Injectable,
-  InternalServerErrorException, Req,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -36,9 +36,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Username or password incorrect');
     } else if (!(await this.comparePassPlainToHash(password, user.password))) {
-      throw new InternalServerErrorException(
-        'Cannot obtain the email associated with this user',
-      );
+      throw new UnauthorizedException('Username or password incorrect.');
     }
 
     return await this.sendOtp(username);
@@ -46,7 +44,8 @@ export class AuthService {
 
   async generateOtpToken(user: UserInfo): Promise<string> {
     const payload = { sub: user.username, email: user.email, role: null };
-    return this.jwtService.sign(payload, { expiresIn: '5m' });
+    const token = this.jwtService.sign(payload, { expiresIn: '5m' });
+    return token;
   }
 
   // Send OTP for two-factor auth.
@@ -90,7 +89,6 @@ export class AuthService {
       role: userInfo.userRole,
       iat: Math.floor(Date.now() / 1000), // Add timestamps to the cookies to reduce the risk of reuse
     };
-    console.log(payload);
     return this.jwtService.sign(payload);
   }
 
