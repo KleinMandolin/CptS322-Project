@@ -8,6 +8,7 @@ import { RecipeIngredientsModule } from '@/recipe-ingredients/recipe-ingredients
 import { RecipesModule } from './recipes/recipes.module';
 import { OrderDetailsModule } from './order-details/order-details.module';
 import { UserManagementModule } from '@/user-management/modules/user-management.module';
+import { InventoryModule } from '@/inventory/inventory.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { UserManagementModule } from '@/user-management/modules/user-management.
     RecipesModule,
     OrderDetailsModule,
     UserManagementModule,
+    InventoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

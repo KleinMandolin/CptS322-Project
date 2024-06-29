@@ -1,18 +1,24 @@
-import { Column, Entity, ManyToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm';
 import { RecipeIngredients } from '@/recipe-ingredients/recipe-ingredients';
+import { StockIngredients } from '@/inventory/entities/stock-ingredients';
 
 @Entity()
 export class Ingredients {
   @PrimaryColumn()
   ingredientName: string;
 
-  @Column({ default: 0 })
-  qty: number;
+  @Column({ default: 'Unit' })
+  unit: string;
 
-  // Many-to-many relationship; for many ingredients, we have many corresponding ids in the recipeDetails.
   @ManyToMany(
     () => RecipeIngredients,
     (recipeDetails) => recipeDetails.ingredient,
   )
   recipeDetails: RecipeIngredients[];
+
+  @OneToMany(
+    () => StockIngredients,
+    (stockIngredients) => stockIngredients.ingredients,
+  )
+  stockIngredients: StockIngredients;
 }
