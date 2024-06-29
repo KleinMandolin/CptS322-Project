@@ -34,10 +34,4 @@ export class IngredientsService {
     ingredient.ingredientName = ingredientName;
     return await this.ingredientsRepository.save(ingredient);
   }
-
-  async updateQty(ingredientName: string, qty: number): Promise<Ingredients> {
-    const ingredient = await this.getIngredient(ingredientName);
-    ingredient.qty = qty;
-    return this.ingredientsRepository.save(ingredient);
-  }
 }

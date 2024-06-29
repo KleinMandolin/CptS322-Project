@@ -14,7 +14,7 @@ export class GetOrderDetailsDto {
   @IsInt()
   orderId: number;
 
-  @IsDecimal()
+  @IsDecimal({})
   @IsNotEmpty()
   total: number;
 

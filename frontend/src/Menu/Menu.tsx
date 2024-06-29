@@ -103,7 +103,7 @@ class Menu extends React.Component<any, any> {
     return (
       <div className="menu">
         {this.state.fullmenu.map((menuItem) => {
-          const { recipeName, price, description } = menuItem;
+          const { recipeName, price, descriptions } = menuItem;
           if (
             this.state.category === 'all' ||
             menuItem.mealType === this.state.category
@@ -121,7 +121,7 @@ class Menu extends React.Component<any, any> {
                   <header>
                     <h4 className="cost">${price}</h4>
                   </header>
-                  <p className="description">{description}</p>
+                  <p className="description">{descriptions}</p>
                 </div>
               </article>
             );
@@ -139,10 +139,11 @@ class Menu extends React.Component<any, any> {
           // Preserve shopping cart but reload menu
           if (this.isEmpty(this.state.cart)) {
             data.recipes.forEach((item) => {
-              const { recipeName, price } = item;
+              const { recipeName, price, descriptions } = item;
               this.state.cart[recipeName] = {
                 name: recipeName,
                 price: parseFloat(price),
+                description: descriptions,
                 count: 0,
               };
             });
@@ -160,50 +161,32 @@ class Menu extends React.Component<any, any> {
 
   // converts shopping cart to json format, getting rid of empty
   // (count=0) values
-  checkout() {
+  checkout = () => {
     const cart = this.state.cart;
-    // maps specific json format from cart (cart contains price, unnecessary for backend reciept)
-    /*const wholeCart = Object.entries(cart).map(([key, value]) => {
+
+    // Map cart items to the required JSON format and filter out items with count 0
+    const filteredCart = Object.entries(cart).map(([key, value]) => {
       if (cart[key].count > 0) {
         return {
           recipeName: cart[key].name,
           qty: cart[key].count,
         };
       }
-    });*/
+      return null; // Explicitly return null for items with count 0
+    }).filter(item => item !== null); // Filter out null values
 
-    // if count of an item == 0, it was replaced with null
-    // which is the filtered using code from here:
-    // https://stackoverflow.com/questions/61382447/filter-out-null-value-from-array-in-react
-    const filteredCart = wholeCart.filter((q) => !!q);
 
-    // add item to total json file
-    const order = {
-      orderDetails: filteredCart,
-    };
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    axios.post(`${backendUrl}/order-details/create`, { orderDetails: filteredCart },
+        { headers: { 'Content-Type': 'application/json' },
+          withCredentials: true })
+        .catch((error) => {
+          console.error('Error submitting order:', error);
+        });
 
-    console.log(JSON.stringify(order));
 
-    /* Output should look like:
-    
-      {
-        "orderDetails": [
-          {
-            "recipeName": "Spaghetti Bolognese",
-            "qty": 2
-          },
-          {
-            "recipeName": "Chicken Caesar Salad",
-            "qty": 3
-          },
-          {
-            "recipeName": "Margherita Pizza",
-            "qty": 1
-          }
-        ]
-      }
-
-    */
+    // Return the list
+    return filteredCart;
   }
 
   render() {
@@ -220,35 +203,41 @@ class Menu extends React.Component<any, any> {
           <span>
             <div className="categoryButtons">
               <button
-                className="all"
-                onClick={() => this.setState({ category: 'all' })}
+                  className="all"
+                  onClick={() => this.setState({category: 'all'})}
               >
                 all
               </button>
               <button
-                className="drinks"
-                onClick={() => this.setState({ category: 'beverage' })}
+                  className="drinks"
+                  onClick={() => this.setState({category: 'beverage'})}
               >
                 drinks
               </button>
               <button
-                className="appetizers"
-                onClick={() => this.setState({ category: 'appetizer' })}
+                  className="appetizers"
+                  onClick={() => this.setState({category: 'appetizer'})}
               >
                 appetizers
               </button>
               <button
-                className="entrees"
-                onClick={() => this.setState({ category: 'entree' })}
+                  className="entrees"
+                  onClick={() => this.setState({category: 'entree'})}
               >
                 entrees
+              </button>
+              <button
+                  className="desserts"
+                  onClick={() => this.setState({category: 'dessert'})}
+              >
+                desserts
               </button>
             </div>
           </span>
           <span>
             <button
-              className="cart_button"
-              onClick={() => this.toggleSidebar()}
+                className="cart_button"
+                onClick={() => this.toggleSidebar()}
             >
               <FaShoppingCart />
             </button>
