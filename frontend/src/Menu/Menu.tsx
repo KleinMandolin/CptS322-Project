@@ -3,6 +3,7 @@ import SideBar from './Sidebar.tsx';
 import { Link } from 'react-router-dom';
 
 import { FaShoppingCart, FaArrowLeft } from 'react-icons/fa';
+import axios from "axios";
 
 class Menu extends React.Component<any, any> {
   constructor(props) {
@@ -102,23 +103,23 @@ class Menu extends React.Component<any, any> {
     return (
       <div className="menu">
         {this.state.fullmenu.map((menuItem) => {
-          const { item_name, cost, description } = menuItem;
+          const { recipeName, price, description } = menuItem;
           if (
             this.state.category === 'all' ||
-            menuItem.category === this.state.category
+            menuItem.mealType === this.state.category
           )
             return (
-              <article key={item_name} className="menuItem">
+              <article key={recipeName} className="menuItem">
                 <button
-                  key={item_name}
+                  key={recipeName}
                   className="menuButton"
-                  onClick={() => this.incrCount(item_name)}
+                  onClick={() => this.incrCount(recipeName)}
                 >
-                  {item_name}
+                  {recipeName}
                 </button>
                 <div className="itemInfo">
                   <header>
-                    <h4 className="cost">${cost}</h4>
+                    <h4 className="cost">${price}</h4>
                   </header>
                   <p className="description">{description}</p>
                 </div>
@@ -131,41 +132,30 @@ class Menu extends React.Component<any, any> {
 
   // on component mount, fetches menu json and inits values
   populate() {
-    fetch('/testmenu.json', { method: 'GET' }) // url to access, GET call
-      .then(async (response) => {
-        const data = await response.json();
+    axios.get('http://localhost:3000/recipes')
+        .then((response) => {
+          const data = response.data;
 
-        // check for error response
-        if (!response.ok) {
-          // get error message from body or default to response statusText
-          const error = (data && data.message) || response.statusText;
-          return Promise.reject(error);
-        }
-
-        // in case shopping cart still exists (e.g. went from shopping cart
-        //    back to menu, preserve shopping cart but reload menu)
-        if (this.isEmpty(this.state.cart)) {
-          {
-            data.map((menuItem) => {
-              const { item_name, cost } = menuItem;
-              this.state.cart[item_name] = {
-                name: item_name,
-                price: parseFloat(cost),
+          // Preserve shopping cart but reload menu
+          if (this.isEmpty(this.state.cart)) {
+            data.recipes.forEach((item) => {
+              const { recipeName, price } = item;
+              this.state.cart[recipeName] = {
+                name: recipeName,
+                price: parseFloat(price),
                 count: 0,
               };
             });
           }
-        }
-
-        // create frontend menu layout
-        this.setState({
-          fullmenu: data,
+          // Create frontend menu layout
+          this.setState({
+            fullmenu: data.recipes,
+          });
+        })
+        .catch((error) => {
+          this.setState({ errorMessage: error.toString() });
+          console.error('Error in get count.', error);
         });
-      })
-      .catch((error) => {
-        this.setState({ errorMessage: error.toString() });
-        console.error('Error in get count.', error);
-      });
   }
 
   // converts shopping cart to json format, getting rid of empty
@@ -173,14 +163,14 @@ class Menu extends React.Component<any, any> {
   checkout() {
     const cart = this.state.cart;
     // maps specific json format from cart (cart contains price, unnecessary for backend reciept)
-    const wholeCart = Object.entries(cart).map(([key, value]) => {
+    /*const wholeCart = Object.entries(cart).map(([key, value]) => {
       if (cart[key].count > 0) {
         return {
           recipeName: cart[key].name,
           qty: cart[key].count,
         };
       }
-    });
+    });*/
 
     // if count of an item == 0, it was replaced with null
     // which is the filtered using code from here:
@@ -237,7 +227,7 @@ class Menu extends React.Component<any, any> {
               </button>
               <button
                 className="drinks"
-                onClick={() => this.setState({ category: 'drink' })}
+                onClick={() => this.setState({ category: 'beverage' })}
               >
                 drinks
               </button>
