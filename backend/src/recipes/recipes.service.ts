@@ -1,8 +1,10 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Recipes } from './recipes';
-import { Repository } from 'typeorm';
-import { CreateRecipeDto } from '@/recipe-ingredients/dto/create-recipe-dto';
+import {Injectable, InternalServerErrorException, NotFoundException,} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Recipes} from './recipes';
+import {Repository} from 'typeorm';
+import {CreateRecipeDto} from '@/recipe-ingredients/dto/create-recipe-dto';
+import {GetRecipesDto} from '@/recipes/dto/get-recipes.dto';
+import {plainToInstance} from 'class-transformer';
 
 @Injectable()
 export class RecipesService {
@@ -25,16 +27,22 @@ export class RecipesService {
     recipe.price = parseFloat(recipeDto.price);
     recipe.mealType = recipeDto.mealType;
     recipe.descriptions = recipeDto.description;
-    try { return this.recipesRepository.save(recipe);
+    try {
+      return this.recipesRepository.save(recipe);
     } catch (error) {
       throw new InternalServerErrorException(`Error adding recipe`);
     }
   }
 
+  async getRecipes(): Promise<GetRecipesDto> {
+    const recipes = await this.recipesRepository.find();
+    return plainToInstance(GetRecipesDto, { recipes });
+  }
+
   async removeRecipe(recipeName: string): Promise<void> {
     try {
       const recipe = await this.findRecipe(recipeName);
-      if(recipe) {
+      if (recipe) {
         await this.recipesRepository.remove(recipe);
       } else {
         throw new NotFoundException(`Recipe not found`);
