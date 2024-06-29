@@ -24,6 +24,7 @@ export class RecipesService {
     recipe.recipeName = recipeDto.recipeName;
     recipe.price = parseFloat(recipeDto.price);
     recipe.mealType = recipeDto.mealType;
+    recipe.descriptions = recipeDto.description;
     try { return this.recipesRepository.save(recipe);
     } catch (error) {
       throw new InternalServerErrorException(`Error adding recipe`);

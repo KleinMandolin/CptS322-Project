@@ -21,11 +21,15 @@ export class CreateRecipeDto {
   // The type of meal (e.g., appetizer, main course, dessert, beverage)
   @IsString()
   @IsNotEmpty()
-  mealType: 'appetizer' | 'main_course' | 'dessert' | 'beverage';
+  mealType: 'appetizer' | 'entree' | 'dessert' | 'beverage';
 
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => CreateRecipeDetailDto)
   ingredients: CreateRecipeDetailDto[];
+
+  @IsString()
+  @IsNotEmpty()
+  description: string;
 }
