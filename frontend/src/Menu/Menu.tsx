@@ -103,7 +103,7 @@ class Menu extends React.Component<any, any> {
     return (
       <div className="menu">
         {this.state.fullmenu.map((menuItem) => {
-          const { recipeName, price, description } = menuItem;
+          const { recipeName, price, descriptions } = menuItem;
           if (
             this.state.category === 'all' ||
             menuItem.mealType === this.state.category
@@ -121,7 +121,7 @@ class Menu extends React.Component<any, any> {
                   <header>
                     <h4 className="cost">${price}</h4>
                   </header>
-                  <p className="description">{description}</p>
+                  <p className="description">{descriptions}</p>
                 </div>
               </article>
             );
@@ -139,10 +139,11 @@ class Menu extends React.Component<any, any> {
           // Preserve shopping cart but reload menu
           if (this.isEmpty(this.state.cart)) {
             data.recipes.forEach((item) => {
-              const { recipeName, price } = item;
+              const { recipeName, price, descriptions } = item;
               this.state.cart[recipeName] = {
                 name: recipeName,
                 price: parseFloat(price),
+                description: descriptions,
                 count: 0,
               };
             });
@@ -163,14 +164,14 @@ class Menu extends React.Component<any, any> {
   checkout() {
     const cart = this.state.cart;
     // maps specific json format from cart (cart contains price, unnecessary for backend reciept)
-    /*const wholeCart = Object.entries(cart).map(([key, value]) => {
+    const wholeCart = Object.entries(cart).map(([key, value]) => {
       if (cart[key].count > 0) {
         return {
           recipeName: cart[key].name,
           qty: cart[key].count,
         };
       }
-    });*/
+    });
 
     // if count of an item == 0, it was replaced with null
     // which is the filtered using code from here:
@@ -182,8 +183,8 @@ class Menu extends React.Component<any, any> {
       orderDetails: filteredCart,
     };
 
-    console.log(JSON.stringify(order));
 
+    console.log(JSON.stringify(order));
     /* Output should look like:
     
       {
