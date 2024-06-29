@@ -12,10 +12,13 @@ export class Recipes {
 
   @Column({
     type: 'enum',
-    enum: ['appetizer', 'main_course', 'dessert', 'beverage'],
-    default: 'main_course',
+    enum: ['appetizer', 'entree', 'dessert', 'beverage'],
+    default: 'entree',
   })
-  mealType: 'appetizer' | 'main_course' | 'dessert' | 'beverage';
+  mealType: 'appetizer' | 'entree' | 'dessert' | 'beverage';
+
+  @Column('text', { nullable: true })
+  descriptions: string;
 
   @OneToMany(() => RecipeIngredients, (recipeDetails) => recipeDetails.recipe)
   recipeDetails: RecipeIngredients[];

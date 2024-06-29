@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
 import axios from 'axios';
+import {useNavigate} from "react-router-dom";
 
 export const TwoFactorAuth = () => {
   const isErrorWithMessage = (error: unknown): error is { message: string } => {
@@ -8,18 +8,9 @@ export const TwoFactorAuth = () => {
   };
 
   const [code, setCode] = useState('');
-  const location = useLocation();
-  const [username, setUsername] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Username is passed via state in the location object from the previous page
-    if (location.state && location.state.username) {
-      setUsername(location.state.username);
-    } else {
-      setError('Username not found. Please try again.');
-    }
-  }, [location.state]);
 
   // Handle the submission. Declare type for the event - react form element.
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -28,13 +19,13 @@ export const TwoFactorAuth = () => {
 
     try {
       const response = await axios.post(
-        `${backendUrl}/auth/verify2fa`,
-        { username, code },
+        `${backendUrl}/auth/verify-otp`,
+        { code },
         { withCredentials: true }
       );
-
       if (response.data.success) {
         alert('Login Successful');
+        navigate(`/launchpad`, { replace: true })
       } else {
         setError('Invalid code. Try again.');
       }

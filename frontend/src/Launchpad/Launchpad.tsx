@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 
 class Launchpad extends React.Component<any, any> {
   constructor(props) {
     super(props);
-
     this.state = {};
   }
 
@@ -23,9 +22,10 @@ class Launchpad extends React.Component<any, any> {
       const data = response.data;
       if (data.success) {
         console.log(data);
+        window.location.href = '/';
       } else {
-        console.log('Login failed: ', data);
-        alert('Login failed');
+        console.log('Logout failed: ', data);
+        alert('Logout failed');
       }
     } catch (error) {
       // @ts-expect-error: Error will have a response

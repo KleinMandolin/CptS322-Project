@@ -14,11 +14,12 @@ export const Login = () => {
       const response = await axios.post(
         `${backendUrl}/auth/login`,
         { username, password },
-        { headers: { 'Content-Type': 'application/json' } }
+        { headers: { 'Content-Type': 'application/json' },
+        withCredentials: true }
       );
 
       const data = response.data;
-      if (data.waitingForCode) {
+      if (data.success) {
         console.log(data);
         navigate('login/2fa', { state: { username } });
       } else {
