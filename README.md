@@ -45,7 +45,7 @@ The secure login will be MFA at minimum, with every feature except for the order
 
 1. Set up PostgrSQL
    </br>`psql -U postgres`
-   </br>`create database practicedb`
+   </br>`create database [database name]`
    </br>`\q`
 2. Install dependencies. Separately for both the 'frontend' and 'backend' folders, run
    </br>`npm i`
@@ -86,10 +86,9 @@ Provide steps to reproduce the problem and/or name a file or a function where th
 5. Submit a pull request :D
 
 ## Additional Documentation
+- [Sprint 1](https://github.com/KleinMandolin/CptS322-Project/blob/427c1af5b76c932843b54ca7478cde643ac8de74/Sprint%201%20Report.pdf)
 
-TODO: Provide links to additional documentation that may exist in the repo, e.g.,
-  * Sprint reports
-  * User links
+- [Samantha Brewer Frontend Dev Journal](https://docs.google.com/document/d/1IedBmgP0wjOv2Pa_4kh6zjgmeQ1HBDAq2gby1Dp4A3E)
 
 ## License
 
