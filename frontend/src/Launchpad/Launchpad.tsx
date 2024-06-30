@@ -5,7 +5,19 @@ import axios from 'axios';
 class Launchpad extends React.Component<any, any> {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      role: null,
+    };
+  }
+
+  async componentDidMount() {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    try {
+      const response = await axios.get(`${backendUrl}/auth/get-role`, { withCredentials: true });
+      this.setState({ role: response.data.role });
+    } catch (error) {
+      console.error('Error fetching role:', error);
+    }
   }
 
   logout = async () => {
@@ -42,6 +54,8 @@ class Launchpad extends React.Component<any, any> {
   };
 
   render() {
+    const { role } = this.state;
+
     return (
       <>
         <div className="menu_header">
@@ -61,6 +75,11 @@ class Launchpad extends React.Component<any, any> {
           <Link to="/menu" style={{ textDecoration: 'none' }}>
             <button className="nav-button">Menu</button>
           </Link>
+           {role === 'admin' && (
+            <Link to="/add-user" style={{ textDecoration: 'none' }}>
+              <button className="nav-button">Add User</button>
+            </Link>
+          )}
           <h1>Food</h1>
         </div>
       </>
