@@ -10,5 +10,6 @@ export class IngredientExpirationDto {
   expirationDate: Date;
 
   @IsNumber()
+  @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
   qty: number;
 }

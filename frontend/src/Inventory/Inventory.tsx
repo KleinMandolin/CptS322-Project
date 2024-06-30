@@ -1,5 +1,8 @@
-import ListComponent from '../components/ListComponent.tsx';
+import IngredientListComponent from '../components/IngredientListComponent.tsx';
 import { IngredientColumn } from '../components/Types.tsx';
+import { FaArrowLeft } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import AddStockComponent from '../components/AddStockComponent.tsx';
 
 const backendUrl = 'http://localhost:3000';
 const summaryPath = `http://localhost:3000/inventory/ingredient-summary`
@@ -26,12 +29,19 @@ const keyPrefixSummary = 'ingredients'
 const Inventory = () => {
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
+      <Link to="/launchpad">
+        <button className="return_button">
+          <FaArrowLeft />
+        </button>
+      </Link>
+      <h1>Inventory Order</h1>
+      <AddStockComponent></AddStockComponent>
       <h1>Inventory Expiring</h1>
-      <ListComponent columns={expiringColumns} apiUrl={expiringPath} keyPrefix={keyPrefixSummary} />
+      <IngredientListComponent columns={expiringColumns} apiUrl={expiringPath} keyPrefix={keyPrefixSummary} />
       <h1>Inventory Shortage</h1>
-      <ListComponent columns={summaryColumns} apiUrl={lowPath} keyPrefix={keyPrefixSummary} />
+      <IngredientListComponent columns={summaryColumns} apiUrl={lowPath} keyPrefix={keyPrefixSummary} />
       <h1>Inventory List</h1>
-      <ListComponent columns={summaryColumns} apiUrl={summaryPath} keyPrefix={keyPrefixSummary} />
+      <IngredientListComponent columns={summaryColumns} apiUrl={summaryPath} keyPrefix={keyPrefixSummary} />
     </div>
   );
 };

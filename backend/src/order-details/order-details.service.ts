@@ -106,7 +106,7 @@ export class OrderDetailsService {
     }
   }
 
-  async getOrders(): Promise<any[]> {
+  async getOrders(): Promise<{ orders: any }> {
     const unformattedOrders = await this.ordersRepository.find({
       relations: ['orderDetails', 'orderDetails.recipe'],
     });
