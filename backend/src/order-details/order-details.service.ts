@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Recipes } from '../recipes/recipes';
+import { Recipes } from '@/recipes/recipes';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderDetails } from './order-details';
-import { Orders } from '../orders/orders';
+import { Orders } from '@/orders/orders';
 import { GetOrderDetailsDto } from './dto/get-order-details.dto';
 import { CreateOrderRecipesDto } from './dto/create-order-recipes.dto';
 import { GetOrderRecipeDto } from './dto/get-order-recipe.dto';
+import { CreateOrderRecipeDto } from '@/order-details/dto/create-order-recipe.dto';
+import { InventoryService } from '@/inventory/inventory.service';
+import { queue } from 'rxjs';
 
 @Injectable()
 export class OrderDetailsService {
@@ -17,6 +20,7 @@ export class OrderDetailsService {
     private readonly orderDetailsRepository: Repository<OrderDetails>,
     @InjectRepository(Orders)
     private readonly ordersRepository: Repository<Orders>,
+    private readonly inventoryService: InventoryService,
   ) {}
 
   async createOrder(
@@ -55,6 +59,10 @@ export class OrderDetailsService {
         qty: qty,
         price: price,
       });
+
+      await this.subtractStockFromIngredientAggregate(
+        createOrderRecipesDto.orderDetails,
+      );
     }
 
     // Update the order total and save the order again
@@ -67,6 +75,36 @@ export class OrderDetailsService {
       total: savedOrder.total,
       orderDetails: orderDetailsList,
     };
+  }
+
+  private async subtractStockFromIngredientAggregate(
+    orderDetails: CreateOrderRecipeDto[],
+  ): Promise<void> {
+    const aggregatedIngredients: { [ingredientName: string]: number } = {};
+
+    for (const createOrderRecipeDto of orderDetails) {
+      const { recipeName, qty } = createOrderRecipeDto;
+      const recipe = await this.recipesRepository.findOne({
+        where: { recipeName },
+        relations: ['recipeDetails'],
+      });
+      if (!recipe) {
+        throw new NotFoundException(`Recipe: ${recipeName} not found`);
+      }
+      for (const ingredient of recipe.recipeDetails) {
+        const ingredientQty = ingredient.qty * qty;
+
+        if (!aggregatedIngredients[ingredient.ingredientName]) {
+          aggregatedIngredients[ingredient.ingredientName] = 0;
+        }
+
+        aggregatedIngredients[ingredient.ingredientName] += ingredientQty;
+      }
+    }
+
+    for (const [ingredientName, qty] of Object.entries(aggregatedIngredients)) {
+      await this.inventoryService.subtractIngredient(ingredientName, qty);
+    }
   }
 
   async getOrders(): Promise<Orders[]> {

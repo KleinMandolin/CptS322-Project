@@ -27,14 +27,28 @@ export class InventoryController {
     }
   }
 
-  @Get('ingredient-summary/:name')
-  async getIngredientSummary(@Param('name') ingredientName: string) {
+  @Get('ingredient-summary')
+  async getIngredientSummary() {
     try {
-      return this.inventoryService.getIngredientSummary(ingredientName);
+      return this.inventoryService.getIngredientSummary();
     } catch (error) {
       throw new InternalServerErrorException(
-        `Could not retrieve summary of ${ingredientName}`,
+        `Could not retrieve summary of ingredients`,
       );
+    }
+  }
+
+  @Get('low-summary')
+  async getLow() {
+    return this.inventoryService.ingredientSummaryLow();
+  }
+
+  @Get('expiring-summary')
+  async getExpiring() {
+    try {
+      return this.inventoryService.nearExpiration();
+    } catch (error) {
+      throw new InternalServerErrorException('Error getting expired items');
     }
   }
 }

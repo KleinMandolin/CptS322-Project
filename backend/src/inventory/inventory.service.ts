@@ -1,10 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Ingredients } from '@/ingredients/ingredients';
 import { Repository } from 'typeorm';
 import { Stock } from '@/inventory/entities/stock';
 import { StockIngredients } from '@/inventory/entities/stock-ingredients';
 import { CreateStockDto } from '@/inventory/dto/create-stock.dto';
+import { CreateIngredientSummaryDto } from '@/inventory/dto/create-ingredient-summary.dto';
+import { SummaryIngredientDto } from '@/inventory/dto/summary-ingredient.dto';
 
 @Injectable()
 export class InventoryService {
@@ -24,7 +30,6 @@ export class InventoryService {
 
     for (const ingredientDto of ingredients) {
       const { ingredientName, expirationDate, qty } = ingredientDto;
-      console.log(`Attempting to create ingredient: ${ingredientName}`);
       const ingredient = await this.ingredientsRepository.findOne({
         where: { ingredientName },
       });
@@ -35,13 +40,6 @@ export class InventoryService {
         });
       }
 
-      console.log({
-        stockId: stockEntity.stockId,
-        ingredientName,
-        qty,
-        expirationDate,
-      });
-
       const stockItem = this.stockIngredientsRepository.create({
         stockId: stockEntity.stockId,
         ingredientName: ingredientName,
@@ -49,37 +47,110 @@ export class InventoryService {
         expirationDate: expirationDate,
       });
 
-      console.log(JSON.stringify(stockItem));
-
       await this.stockIngredientsRepository.save(stockItem);
     }
   }
 
-  async getIngredientSummary(
-    ingredientName: string,
-  ): Promise<{ unit: string; qty: any }> {
-    console.log(ingredientName); // Todo: remove this line
-    // Get the summation of all ingredients of this name.
-    let sum = await this.stockIngredientsRepository
-      .createQueryBuilder('stock_ingredients')
-      .select('SUM(stock_ingredients.qty)', 'sum')
-      .where('stock_ingredients.ingredientName = :ingredientName', {
-        ingredientName,
-      })
-      .getRawOne();
-    const ingredient = await this.ingredientsRepository.findOne({
-      where: { ingredientName: ingredientName },
-    });
+  async getIngredientSummary(): Promise<CreateIngredientSummaryDto> {
+    const ingredients = await this.ingredientsRepository.find();
+    const summaryResults: SummaryIngredientDto[] = [];
 
-    if (!sum) {
-      sum = 0;
+    for (const item of ingredients) {
+      // Get the summation of all ingredients of this name.
+      const sumObject = await this.stockIngredientsRepository
+        .createQueryBuilder('stock_ingredients')
+        .select('SUM(stock_ingredients.qty)', 'sum')
+        .where('stock_ingredients.ingredientName = :ingredientName', {
+          ingredientName: item.ingredientName,
+        })
+        .getRawOne();
+      const ingredient = await this.ingredientsRepository.findOne({
+        where: { ingredientName: item.ingredientName },
+      });
+
+      let sum = 0;
+
+      if (!sumObject.sum) {
+        sum = 0;
+      } else {
+        sum = sumObject.sum;
+      }
+      if (!ingredient) {
+        throw new NotFoundException(
+          `Ingredient: ${item.ingredientName}, could not be found.`,
+        );
+      }
+      const ingredientMeasure = ingredient.unit;
+      summaryResults.push({
+        ingredientName: ingredient.ingredientName,
+        unit: ingredientMeasure,
+        qty: sum,
+      });
     }
-    if (!ingredient) {
-      throw new NotFoundException(
-        `Ingredient: ${ingredientName}, could not be found.`,
-      );
+    return { ingredients: summaryResults };
+  }
+
+  async subtractIngredient(ingredientName: string, qty: number): Promise<void> {
+    let remainingQty = qty;
+    while (remainingQty > 0) {
+      const stockIngredient = await this.stockIngredientsRepository
+        .createQueryBuilder('stock_ingredients')
+        .where('stock_ingredients.ingredientName = :ingredientName', {
+          ingredientName,
+        })
+        .orderBy('stock_ingredients.expirationDate', 'ASC')
+        .getOne();
+      if (!stockIngredient.qty) {
+        throw new NotFoundException(
+          `No stock entry for ingredient: ${ingredientName}`,
+        );
+      }
+      if (stockIngredient.qty >= remainingQty) {
+        stockIngredient.qty -= remainingQty;
+        remainingQty = 0;
+      } else {
+        remainingQty -= stockIngredient.qty;
+        stockIngredient.qty = 0;
+      }
+
+      try {
+        if (stockIngredient.qty === 0) {
+          await this.stockIngredientsRepository.remove(stockIngredient);
+        } else {
+          await this.stockIngredientsRepository.save(stockIngredient);
+        }
+      } catch (error) {
+        throw new InternalServerErrorException('Error updating stock entry');
+      }
     }
-    const ingredientMeasure = ingredient.unit || null;
-    return { qty: sum, unit: ingredientMeasure };
+  }
+
+  async nearExpiration(): Promise<StockIngredients[]> {
+    const currentDate = new Date();
+    const sevenDaysLater = new Date();
+    sevenDaysLater.setDate(currentDate.getDate() + 7);
+
+    const items = await this.stockIngredientsRepository
+      .createQueryBuilder('stock_ingredients')
+      .where(
+        'stock_ingredients.expirationDate BETWEEN :currentDate AND :sevenDaysLater',
+        {
+          currentDate,
+          sevenDaysLater,
+        },
+      )
+      .getMany();
+    return items;
+  }
+
+  async ingredientSummaryLow(): Promise<CreateIngredientSummaryDto> {
+    const ingredientSummary = await this.getIngredientSummary();
+    const lowIngredients = [];
+    for (const ingredient of ingredientSummary.ingredients) {
+      if (ingredient.qty < 10) {
+        lowIngredients.push(ingredient);
+      }
+    }
+    return { ingredients: lowIngredients };
   }
 }
