@@ -16,7 +16,7 @@ const orderColumns: OrderColumn[] = [
 const keyPrefixSummary = 'orders'
 
 
-const Revenue = () => {
+const Orders = () => {
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
       <Link to="/launchpad">
@@ -30,4 +30,4 @@ const Revenue = () => {
   );
 };
 
-export default Revenue;
+export default Orders;

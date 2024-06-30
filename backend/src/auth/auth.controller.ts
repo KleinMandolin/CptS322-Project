@@ -17,6 +17,7 @@ import { CreateLoginDto } from '@/auth/dto/create-login.dto';
 import { UserInfoService } from '@/user-management/services/user-info.service';
 import { UserInfo } from '@/user-management/entities/user-info';
 import { JwtService } from '@nestjs/jwt';
+import { _Role } from '@/user-management/enums/role-enum';
 
 @Controller('auth')
 export class AuthController {
@@ -51,11 +52,10 @@ export class AuthController {
     });
   }
 
-  // Test endpoint
-  @Post('test')
-  async test(@Res() res: any): Promise<{ success: boolean }> {
-    console.log('test endpoint hit');
-    return res.json({ success: true });
+  @UseGuards(AuthGuard('jwt'))
+  @Get('get-role')
+  async getRole(@Req() req): Promise<{ role: _Role }> {
+    return { role: req.user.userRole };
   }
 
   @UseGuards(AuthGuard('jwt'))
