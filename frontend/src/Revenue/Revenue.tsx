@@ -1,27 +1,31 @@
-import ListComponent from '../components/ListComponent.tsx';
-import { IngredientColumn, OrderColumn } from '../components/Types.tsx';
+import { OrderColumn } from '../components/Types.tsx';
+import OrdersDetailsListComponent from '../components/OrdersDetailsListComponent.tsx';
+import { FaArrowLeft } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const backendUrl = 'http://localhost:3000';
 const ordersPath = `${backendUrl}/order-details/orders`
 
-const summaryColumns: IngredientColumn[] = [
-  { label: 'Ingredient', path: 'ingredientName'},
-  { label: 'Quantity', path: 'qty'},
-  { label: 'Measurement Unit', path: 'unit'},
-];
-
 const orderColumns: OrderColumn[] = [
-  { label: ''}
+  { label: 'Order ID', path: 'orderId'},
+  { label: 'Recipe', path: 'recipeName'},
+  { label: 'Category', path: 'mealType'},
+  { label: 'Order Total', path: 'total'}
 ]
 
-const keyPrefixSummary = 'ingredients'
+const keyPrefixSummary = 'orders'
 
 
 const Revenue = () => {
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
-      <h1>Inventory Expiring</h1>
-      <ListComponent columns={expiringColumns} apiUrl={expiringPath} keyPrefix={keyPrefixSummary} />
+      <Link to="/launchpad">
+        <button className="return_button">
+          <FaArrowLeft />
+        </button>
+      </Link>
+      <h1>Orders</h1>
+      <OrdersDetailsListComponent columns={orderColumns} apiUrl={ordersPath} keyPrefix={keyPrefixSummary} />
     </div>
   );
 };

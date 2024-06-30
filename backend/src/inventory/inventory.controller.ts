@@ -17,6 +17,7 @@ export class InventoryController {
   async createStock(
     @Body() createStockDto: CreateStockDto,
   ): Promise<{ success: boolean }> {
+    console.log(createStockDto);
     try {
       await this.inventoryService.createStock(createStockDto);
       return { success: true };
