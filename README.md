@@ -52,13 +52,13 @@ The secure login will be MFA at minimum, with every feature except for the order
 3. Create a file `.env` in 'backend' folder, then paste in the below text and save:
    ```
    DB_HOST=localhost
-   DB_PORT=5432
-   DB_USERNAME=postgres
-   DB_NAME=practicedb
+   DB_PORT=[postgresDB port]
+   DB_USERNAME=[your username]
+   DB_NAME=[your database]
    MAILGUN_HOST=smtp.mailgun.org
-   MAILGUN_LOGIN=postmaster@sandboxd4d3748afd4a4e04b1bfef7dbc4d788c.mailgun.org
-   MAILGUN_PASS=3b7376739b1d0c91b9fb524cc43955f8-a4da91cf-c397d526
-   JWT_SECRET=772e3d4d55a4684e34039481480dc97de9da58c9404b22470d02b38a8e9e95aa926a5e427071e6796b1c1c0f70d49911458a90b7fff032e2202f2d6f4ffe38df
+   MAILGUN_LOGIN=[your mailgun login]
+   MAILGUN_PASS=[your mailgun password]
+   JWT_SECRET=[jwt secret]
 
    ```
 4. Open separate terminals in the 'frontend' and 'backend' folders. Type `npm run start` in the backend terminal first, then the frontend terminal.
