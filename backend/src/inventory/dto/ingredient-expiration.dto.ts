@@ -1,7 +1,7 @@
 import { IsDate, IsNumber, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
-export class IngredientDto {
+export class IngredientExpirationDto {
   @IsString()
   ingredientName: string;
 

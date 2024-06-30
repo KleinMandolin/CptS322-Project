@@ -31,7 +31,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: any): Promise<{ userRole: _Role; sub: string }> {
     const userRole = payload.role === null ? 'none' : payload.role;
     const usernameInCookie = payload.sub;
-    console.log(`sub: ${usernameInCookie} role: ${userRole}`);
 
     if (!(await this.userCredentialsService.findUser(usernameInCookie))) {
       throw new ForbiddenException('Jwt has been manipulated');
@@ -45,7 +44,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 }
 
 const jwtExtractor = (req: Request): string | null => {
-  console.log(`Req: ${JSON.stringify(req.cookies)}`);
   if (req.cookies && 'jwt' in req.cookies) {
     return req.cookies.jwt;
   } else if (req.cookies && 'otp_token' in req.cookies) {

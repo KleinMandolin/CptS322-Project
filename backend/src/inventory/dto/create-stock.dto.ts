@@ -4,7 +4,7 @@ import {
   IsDate,
   ValidateNested,
 } from 'class-validator';
-import { IngredientDto } from '@/inventory/dto/ingredient.dto';
+import { IngredientExpirationDto } from '@/inventory/dto/ingredient-expiration.dto';
 import { Transform, Type } from 'class-transformer';
 
 export class CreateStockDto {
@@ -15,6 +15,6 @@ export class CreateStockDto {
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => IngredientDto)
-  ingredients: IngredientDto[];
+  @Type(() => IngredientExpirationDto)
+  ingredients: IngredientExpirationDto[];
 }
