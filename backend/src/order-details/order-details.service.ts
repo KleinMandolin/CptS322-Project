@@ -9,7 +9,6 @@ import { CreateOrderRecipesDto } from './dto/create-order-recipes.dto';
 import { GetOrderRecipeDto } from './dto/get-order-recipe.dto';
 import { CreateOrderRecipeDto } from '@/order-details/dto/create-order-recipe.dto';
 import { InventoryService } from '@/inventory/inventory.service';
-import { queue } from 'rxjs';
 
 @Injectable()
 export class OrderDetailsService {
@@ -107,9 +106,26 @@ export class OrderDetailsService {
     }
   }
 
-  async getOrders(): Promise<Orders[]> {
-    return await this.ordersRepository.find({
+  async getOrders(): Promise<any[]> {
+    const unformattedOrders = await this.ordersRepository.find({
       relations: ['orderDetails', 'orderDetails.recipe'],
     });
+
+    const transformedOrders = [];
+
+    for (const order of unformattedOrders) {
+      if (Array.isArray(order.orderDetails)) {
+        for (const detail of order.orderDetails) {
+          transformedOrders.push({
+            orderId: order.orderId,
+            recipeName: detail.recipe.recipeName,
+            mealType: detail.recipe.mealType,
+            total: order.total,
+          });
+        }
+      }
+    }
+
+    return { orders: transformedOrders };
   }
 }

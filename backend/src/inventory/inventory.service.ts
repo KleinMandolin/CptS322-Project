@@ -125,13 +125,16 @@ export class InventoryService {
     }
   }
 
-  async nearExpiration(): Promise<StockIngredients[]> {
+  async nearExpiration(): Promise<{
+    ingredients: { unit: string; ingredientName: string; qty: number; stockId: number; expirationDate: Date }[]
+  }> {
     const currentDate = new Date();
     const sevenDaysLater = new Date();
     sevenDaysLater.setDate(currentDate.getDate() + 7);
 
     const items = await this.stockIngredientsRepository
       .createQueryBuilder('stock_ingredients')
+      .leftJoinAndSelect('stock_ingredients.ingredients', 'ingredients')
       .where(
         'stock_ingredients.expirationDate BETWEEN :currentDate AND :sevenDaysLater',
         {
@@ -140,7 +143,14 @@ export class InventoryService {
         },
       )
       .getMany();
-    return items;
+    const expiring = items.map((item) => ({
+      stockId: item.stockId,
+      ingredientName: item.ingredientName,
+      qty: item.qty,
+      unit: item.ingredients.unit,
+      expirationDate: item.expirationDate,
+    }));
+    return { ingredients: expiring };
   }
 
   async ingredientSummaryLow(): Promise<CreateIngredientSummaryDto> {

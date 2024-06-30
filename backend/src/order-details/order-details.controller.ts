@@ -32,4 +32,9 @@ export class OrderDetailsController {
   ): Promise<GetOrderDetailsDto> {
     return this.orderDetailsService.createOrder(createOrderDto);
   }
+
+  @Get('orders')
+  async orders() {
+    return await this.orderDetailsService.getOrders();
+  }
 }
