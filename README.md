@@ -39,7 +39,21 @@ The secure login will be MFA at minimum, with every feature except for the order
   - [React Icons](https://react-icons.github.io/react-icons/), for scalable icons such as the menu checkout button
 
 - Backend
-  - TODO: input backend add-ons included, such as Axios's backend uses
+  - [NestJS](https://nestjs.com/), backend framework.
+  - [@nestjs/typeorm](https://www.npmjs.com/package/@nestjs/typeorm), models relations to classes.
+  - [@nestjs/jwt](https://www.npmjs.com/package/@nestjs/jwt), jwt handling.
+  - [@nestjs/passport](https://www.npmjs.com/package/@nestjs/passport), create strategies for authentication.
+  - [@nestjs/platform-express](https://www.npmjs.com/package/@nestjs/platform-express), handling for req and res objects.
+  - [axios](https://www.npmjs.com/package/axios), used for the email service to simplify api fetches.
+  - [bcrypt](https://www.npmjs.com/package/bcrypt), hashes passwords to the backend credentials relation.
+  - [class-transformer](https://www.npmjs.com/package/class-transformer/v/0.1.0-beta.10), parses api calls to acceptable types.
+  - [class-validator](https://www.npmjs.com/package/class-validator), validate api call data.
+  - [cookie-parser](https://www.npmjs.com/package/cookie-parser), populate req.cookie by parsing cookies in headers.
+  - [cors](https://www.npmjs.com/package/cors), cross origin resource sharing allows the frontend to communicate with the backend.
+  - [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken), allows the creation of JWTs.
+  - [nodemailer]https://www.npmjs.com/package/nodemailer), sends emails.
+  - [pg](https://www.npmjs.com/package/pg), enables interaction with postgresql database.
+  - [reflect-metadata](https://www.npmjs.com/package/reflect-metadata), access metadata at runtime.
 
 ### Installation Steps
 
@@ -51,30 +65,66 @@ The secure login will be MFA at minimum, with every feature except for the order
    </br>`npm i`
 3. Create a file `.env` in 'backend' folder, then paste in the below text and save:
    ```
-   DB_HOST=localhost
-   DB_PORT=[postgresDB port]
-   DB_USERNAME=[your username]
-   DB_NAME=[your database]
-   MAILGUN_HOST=smtp.mailgun.org
-   MAILGUN_LOGIN=[your mailgun login]
-   MAILGUN_PASS=[your mailgun password]
-   JWT_SECRET=[jwt secret]
+DB_HOST=[your database host]
+DB_PORT=[your database port]
+DB_USERNAME=[your username]
+DB_NAME=[your database name]
+MAILGUN_DOMAIN=[your mailgun domain]
+MAILGUN_API_KEY=[your mailgun api key]
+JWT_SECRET=[your jwt secret]
 
    ```
-4. Open separate terminals in the 'frontend' and 'backend' folders. Type `npm run start` in the backend terminal first, then the frontend terminal.
+4. Open separate terminals in the 'frontend' and 'backend' directories. Type `npm run start` in the backend terminal first, then type `npm run dev` in the frontend directory.
 5. Navigate to the frontend page at [http://localhost:3001](http://localhost:3001)
 
 
 ## Functionality
 
-TODO: Write usage instructions. Structuring it as a walkthrough can help structure this section,
-and showcase your features.
+TODO:
+
+- After completing the above steps, you must first create a user via the postgresql database in the user_info and the user_credentials relations.
+- Add recipes to the recipe relation via postman; mealtype can be 4 values, appetizer, beverage, dessert, and entree. Here is an example POST request:
+
+{
+  "recipeName": "Bruschetta",
+  "price": "5.99",
+  "mealType": "appetizer",
+  "ingredients": [
+    {
+      "ingredientName": "Tomatoes",
+      "qty": "2",
+      "unit": "cups"
+    },
+    {
+      "ingredientName": "Basil",
+      "qty": "1",
+      "unit": "cup"
+    },
+    {
+      "ingredientName": "Olive Oil",
+      "qty": "0.5",
+      "unit": "cup"
+    },
+    {
+      "ingredientName": "Baguette",
+      "qty": "1",
+      "unit": "loaf"
+    }
+  ],
+  "description": "A delicious Italian appetizer made with tomatoes, basil, olive oil, and toasted baguette slices."
+}
+
+- Login.
+- Click on the inventory section. Add inventory.
+- Navigate to the menu section of the launchpad and order your item.
+- Navigate to the revenue section of the launchpad and view orders.
 
 
 ## Known Problems
 
-TODO: Describe any known issues, bugs, odd behaviors or code smells. 
-Provide steps to reproduce the problem and/or name a file or a function where the problem lives.
+TODO: 
+
+- Admins are unable to add users.
 
 
 ## Contributing
