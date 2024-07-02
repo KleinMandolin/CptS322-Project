@@ -4,14 +4,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-// ------------------------------- Uncomment to start emailing ---------------------------------------------
-// import { UserInfo } from '@/user-info/user-info'; // <==================================
-// import { EmailService } from '@/email/email.service';
-// -------------------- Look into login and uncomment those lines as well ----------------------------------
+import { EmailService } from '@/email/email.service';
 import * as bcrypt from 'bcrypt';
 import { UserInfoService } from '@/user-management/services/user-info.service';
 import { UserInfo } from '@/user-management/entities/user-info';
-import { _Role } from '@/user-management/enums/role-enum';
 import { UserCredentialsService } from '@/user-management/services/user-credentials.service';
 
 @Injectable()
@@ -20,8 +16,7 @@ export class AuthService {
     private readonly userCredentialsService: UserCredentialsService,
     private readonly jwtService: JwtService,
     private readonly userInfoService: UserInfoService,
-    // Uncomment for the email service. <============================
-    // private readonly email: EmailService,
+    private readonly email: EmailService,
   ) {}
 
   // Login and two-factor authentication -------------------------------------------------------------------------
@@ -57,16 +52,20 @@ export class AuthService {
     }
 
     // Get personal info for email.
-    const userInfo = this.userInfoService.getInfo(username);
+    const userInfo = await this.userInfoService.getInfo(username);
     if (!userInfo) {
       throw new InternalServerErrorException('User information not found.');
     }
     // Uncomment these lines to receive emails.
     // -----------------------------------------------------------------
-    // const subject = `Authentication Code`; // Subject: authentication code
-    // const text = `Hello, ${userInfo.f_name}, this is your authentication code: // <================================
-    // ${authCode}`; // Personalized message for the authentication code.
-    // await this.email.sendEmail(userInfo.email, subject, text);
+    const subject = `Authentication Code`; // Subject: authentication code
+    const user_credential = await this.userCredentialsService.findUser(
+      userInfo.username,
+    );
+    const authCode = user_credential.twoFactorCode;
+    const text = `Hello, ${userInfo.firstName}, this is your authentication code:
+    ${authCode}`; // Personalized message for the authentication code.
+    await this.email.sendEmail(userInfo.email, subject, text);
     // -----------------------------------------------------------------
 
     return { success: true };

@@ -1,11 +1,19 @@
 {
   "compilerOptions": {
-    "composite": true,
+    "module": "commonjs",
+    "target": "ESNext",
+    "strict": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "noEmit": true
   },
-  "include": ["vite.config.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"]
 }

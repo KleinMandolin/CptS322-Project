@@ -40,10 +40,10 @@ export class AuthController {
 
     const otpToken = await this.authService.generateOtpToken(userInfo);
 
-    res.cookie('otp_token', otpToken, {
+    res.cookie('jwt', otpToken, {
       maxAge: 300000,
       sameSite: 'strict',
-      secure: true,
+      //secure: true,
       httpOnly: true,
     });
 
@@ -86,11 +86,9 @@ export class AuthController {
     res.cookie('jwt', token, {
       maxAge: 1800000,
       sameSite: 'strict',
-      secure: true,
+      //secure: true,
       httpOnly: true,
     });
-
-    res.clearCookie('otp_token');
 
     return res.status(200).send({ success: true });
   }

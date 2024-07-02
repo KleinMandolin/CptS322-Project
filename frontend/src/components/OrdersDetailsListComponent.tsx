@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Order, OrderColumn } from './Types.tsx';
-import axios from 'axios';
+import api from '../Auth/api.ts';
 
 interface ListComponentProps {
   columns: OrderColumn[];
@@ -16,7 +16,7 @@ const OrdersDetailsListComponent: React.FC<ListComponentProps> = ({ columns, api
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<{ orders: Order[] }>(apiUrl, {
+        const response = await api<{ orders: Order[] }>(apiUrl, {
           withCredentials: true
         });
         setItems(response.data.orders);

@@ -3,8 +3,7 @@ import OrdersDetailsListComponent from '../components/OrdersDetailsListComponent
 import { FaArrowLeft } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
-const backendUrl = 'http://localhost:3000';
-const ordersPath = `${backendUrl}/order-details/orders`
+const ordersPath = `/order-details/orders`
 
 const orderColumns: OrderColumn[] = [
   { label: 'Order ID', path: 'orderId'},

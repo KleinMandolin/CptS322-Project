@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -20,6 +21,7 @@ export class UserManagementController {
   ) {}
 
   @Post('add-user')
+  @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   async addUser(@Body() createUserDto: CreateUserDto) {
     return await this.userManagementService.createUser(createUserDto);
