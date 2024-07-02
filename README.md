@@ -64,7 +64,7 @@ The secure login will be MFA at minimum, with every feature except for the order
 2. Install dependencies. Separately for both the 'frontend' and 'backend' folders, run
    </br>`npm i`
 3. Create a file `.env` in 'backend' folder, then paste in the below text and save:
-   ```
+   
 DB_HOST=your database host
 DB_PORT=your database port
 DB_USERNAME=your username
@@ -73,7 +73,7 @@ MAILGUN_DOMAIN=your mailgun domain
 MAILGUN_API_KEY=your mailgun api key
 JWT_SECRET=your jwt secret
 
-   ```
+   
 4. Open separate terminals in the 'frontend' and 'backend' directories. Type `npm run start` in the backend terminal first, then type `npm run dev` in the frontend directory.
 5. Navigate to the frontend page at [http://localhost:3001](http://localhost:3001)
 
