@@ -85,32 +85,32 @@ TODO:
 - After completing the above steps, you must first create a user via the postgresql database in the user_info and the user_credentials relations.
 - Add recipes to the recipe relation via postman; mealtype can be 4 values, appetizer, beverage, dessert, and entree. Here is an example POST request:
 
-{
-  "recipeName": "Bruschetta",
-  "price": "5.99",
-  "mealType": "appetizer",
-  "ingredients": [
-    {
-      "ingredientName": "Tomatoes",
-      "qty": "2",
-      "unit": "cups"
-    },
-    {
-      "ingredientName": "Basil",
-      "qty": "1",
-      "unit": "cup"
-    },
-    {
-      "ingredientName": "Olive Oil",
-      "qty": "0.5",
-      "unit": "cup"
-    },
-    {
-      "ingredientName": "Baguette",
-      "qty": "1",
-      "unit": "loaf"
-    }
-  ],
+{ <br/>
+  "recipeName": "Bruschetta",<br/>
+  "price": "5.99",<br/>
+  "mealType": "appetizer",<br/>
+  "ingredients": [<br/>
+    {<br/>
+      "ingredientName": "Tomatoes",<br/>
+      "qty": "2",<br/>
+      "unit": "cups"<br/>
+    },<br/>
+    {<br/>
+      "ingredientName": "Basil",<br/>
+      "qty": "1",<br/>
+      "unit": "cup"<br/>
+    },<br/>
+    {<br/>
+      "ingredientName": "Olive Oil",<br/>
+      "qty": "0.5",<br/>
+      "unit": "cup"<br/>
+    },<br/>
+    {<br/>
+      "ingredientName": "Baguette",<br/>
+      "qty": "1",<br/>
+      "unit": "loaf"<br/>
+    }<br/>
+  ],<br/>
   "description": "A delicious Italian appetizer made with tomatoes, basil, olive oil, and toasted baguette slices."
 }
 
