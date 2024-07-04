@@ -175,6 +175,10 @@ class Menu extends React.Component<any, any> {
       return null; // Explicitly return null for items with count 0
     }).filter(item => item !== null); // Filter out null values
 
+    // do not checkout if cart is empty
+    if (this.isEmpty(filteredCart)) {
+      return null;
+    }
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     axios.post(`${backendUrl}/order-details/create`, { orderDetails: filteredCart },
