@@ -137,7 +137,7 @@ TODO:
 
 ## Additional Documentation
 - [Sprint 1](https://github.com/KleinMandolin/CptS322-Project/blob/427c1af5b76c932843b54ca7478cde643ac8de74/Sprint%201%20Report.pdf)
-
+- [Sprint 2](https://github.com/KleinMandolin/CptS322-Project/blob/6850ebeb936dbdbcb8d1d187a2cce63447ab0d22/Sprint%202%20Report.pdf)
 - [Samantha Brewer Frontend Dev Journal](https://docs.google.com/document/d/1IedBmgP0wjOv2Pa_4kh6zjgmeQ1HBDAq2gby1Dp4A3E)
 
 ## License
