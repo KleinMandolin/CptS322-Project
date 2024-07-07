@@ -64,7 +64,7 @@ The secure login will be MFA at minimum, with every feature except for the order
 2. Install dependencies. Separately for both the 'frontend' and 'backend' folders, run
    </br>`npm i`
 3. Create a file `.env` in 'backend' folder, then paste in the below text and save:
-   
+```   
 DB_HOST=your database host
 DB_PORT=your database port
 DB_USERNAME=your username
@@ -72,6 +72,7 @@ DB_NAME=your database name
 MAILGUN_DOMAIN=your mailgun domain
 MAILGUN_API_KEY=your mailgun api key
 JWT_SECRET=your jwt secret
+```
 
    
 4. Open separate terminals in the 'frontend' and 'backend' directories. Type `npm run start` in the backend terminal first, then type `npm run dev` in the frontend directory.
@@ -84,35 +85,36 @@ TODO:
 
 - After completing the above steps, you must first create a user via the postgresql database in the user_info and the user_credentials relations.
 - Add recipes to the recipe relation via postman; mealtype can be 4 values, appetizer, beverage, dessert, and entree. Here is an example POST request:
-
-{ <br/>
-  "recipeName": "Bruschetta",<br/>
-  "price": "5.99",<br/>
-  "mealType": "appetizer",<br/>
-  "ingredients": [<br/>
-    {<br/>
-      "ingredientName": "Tomatoes",<br/>
-      "qty": "2",<br/>
-      "unit": "cups"<br/>
-    },<br/>
-    {<br/>
-      "ingredientName": "Basil",<br/>
-      "qty": "1",<br/>
-      "unit": "cup"<br/>
-    },<br/>
-    {<br/>
-      "ingredientName": "Olive Oil",<br/>
-      "qty": "0.5",<br/>
-      "unit": "cup"<br/>
-    },<br/>
-    {<br/>
-      "ingredientName": "Baguette",<br/>
-      "qty": "1",<br/>
-      "unit": "loaf"<br/>
-    }<br/>
-  ],<br/>
+```
+{
+  "recipeName": "Bruschetta",
+  "price": "5.99",
+  "mealType": "appetizer",
+  "ingredients": [
+    {
+      "ingredientName": "Tomatoes",
+      "qty": "2",
+      "unit": "cups"
+    },
+    {
+      "ingredientName": "Basil",
+      "qty": "1",
+      "unit": "cup"
+    },
+    {
+      "ingredientName": "Olive Oil",
+      "qty": "0.5",
+      "unit": "cup"
+    },
+    {
+      "ingredientName": "Baguette",
+      "qty": "1",
+      "unit": "loaf"
+    }
+  ],
   "description": "A delicious Italian appetizer made with tomatoes, basil, olive oil, and toasted baguette slices."
 }
+```
 
 - Login.
 - Click on the inventory section. Add inventory.
