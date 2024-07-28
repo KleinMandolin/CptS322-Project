@@ -27,7 +27,7 @@ The secure login will be MFA at minimum, with every feature except for the order
 - Install NodeJS - `sudo apt install nodejs`
 - Install NPM - `sudo apt install npm`
 - Install PostgreSQL - `sudo apt install postgresql`
-- Create mailgun account
+- [Create mailgun account](https://signup.mailgun.com/new/signup?)
 - Get mailgun api key
 - Get mailgun domain
 - The domain and api key from mailgun will be used for the .env files.
