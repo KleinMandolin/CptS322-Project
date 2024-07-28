@@ -34,6 +34,7 @@ export class OrderDetailsController {
   }
 
   @Get('orders')
+  @Roles(_Role.EMPLOYEE, _Role.ADMIN)
   async orders() {
     return await this.orderDetailsService.getOrders();
   }

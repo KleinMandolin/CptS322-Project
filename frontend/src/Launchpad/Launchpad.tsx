@@ -11,7 +11,7 @@ class Launchpad extends React.Component<any, any> {
   }
 
   async componentDidMount() {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://localhost:3000';
     try {
       const response = await axios.get(`${backendUrl}/auth/get-role`, { withCredentials: true });
       this.setState({ role: response.data.role });

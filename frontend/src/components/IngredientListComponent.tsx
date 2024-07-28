@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Ingredient, IngredientColumn } from './Types';
+import api from '../Auth/api.ts';
 
 interface ListComponentProps {
   columns: IngredientColumn[];
@@ -16,7 +17,7 @@ const IngredientListComponent: React.FC<ListComponentProps> = ({ columns, apiUrl
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<{ ingredients: Ingredient[] }>(apiUrl,{
+        const response = await api.get<{ ingredients: Ingredient[] }>(apiUrl,{
             withCredentials: true
           });
         setItems(response.data.ingredients);

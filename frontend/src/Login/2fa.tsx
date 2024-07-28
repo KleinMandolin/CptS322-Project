@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import {useNavigate} from "react-router-dom";
+import api from '../Auth/api.ts';
 
 export const TwoFactorAuth = () => {
   const isErrorWithMessage = (error: unknown): error is { message: string } => {
@@ -15,11 +15,10 @@ export const TwoFactorAuth = () => {
   // Handle the submission. Declare type for the event - react form element.
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     try {
-      const response = await axios.post(
-        `${backendUrl}/auth/verify-otp`,
+      const response = await api.post(
+        `/auth/verify-otp`,
         { code },
         { withCredentials: true }
       );

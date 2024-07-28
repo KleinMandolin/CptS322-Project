@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../App.css'; // Ensure this import is here for styling
+import '../App.css';
+import api from '../Auth/api.ts';
+import { FaArrowLeft } from 'react-icons/fa';
+import { Link } from 'react-router-dom'; // Ensure this import is here for styling
 
 const AddUser: React.FC = () => {
   const [role, setRole] = useState<string | null>(null);
@@ -15,7 +18,7 @@ const AddUser: React.FC = () => {
   useEffect(() => {
     const fetchRole = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/auth/get-role', { withCredentials: true });
+        const response = await api.get('/auth/get-role', { withCredentials: true });
         setRole(response.data.role);
       } catch (error) {
         setError('Error fetching role');
@@ -38,7 +41,7 @@ const AddUser: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await axios.post('http://localhost:3000/user-management/add-user', { username, password, email, firstName, lastName, userRole }, { withCredentials: true });
+      await api.post('/user-management/add-user', { username, password, email, firstName, lastName, userRole }, { withCredentials: true });
     } catch (error) {
       setError('Error adding user');
     }
@@ -50,6 +53,11 @@ const AddUser: React.FC = () => {
 
   return (
     <div>
+      <Link to="/launchpad">
+        <button className="return_button">
+          <FaArrowLeft />
+        </button>
+      </Link>
       <h1>Add User</h1>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>

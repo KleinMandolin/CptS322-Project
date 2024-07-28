@@ -1,6 +1,7 @@
 import React from 'react';
 import SideBar from './Sidebar.tsx';
 import { Link } from 'react-router-dom';
+import api from '../Auth/api'
 
 import { FaShoppingCart, FaArrowLeft } from 'react-icons/fa';
 import axios from "axios";
@@ -132,7 +133,7 @@ class Menu extends React.Component<any, any> {
 
   // on component mount, fetches menu json and inits values
   populate() {
-    axios.get('http://localhost:3000/recipes')
+    api.get('/recipes')
         .then((response) => {
           const data = response.data;
 
@@ -180,8 +181,7 @@ class Menu extends React.Component<any, any> {
       return null;
     }
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    axios.post(`${backendUrl}/order-details/create`, { orderDetails: filteredCart },
+    api.post(`/order-details/create`, { orderDetails: filteredCart },
         { headers: { 'Content-Type': 'application/json' },
           withCredentials: true })
         .catch((error) => {

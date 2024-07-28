@@ -11,6 +11,7 @@ import { UserManagementModule } from '@/user-management/modules/user-management.
 import { InventoryModule } from '@/inventory/inventory.module';
 
 @Module({
+  controllers: [AppController],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
@@ -40,7 +41,8 @@ import { InventoryModule } from '@/inventory/inventory.module';
     UserManagementModule,
     InventoryModule,
   ],
-  controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure() {}
+}

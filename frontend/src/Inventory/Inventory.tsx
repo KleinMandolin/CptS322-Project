@@ -4,10 +4,9 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import AddStockComponent from '../components/AddStockComponent.tsx';
 
-const backendUrl = 'http://localhost:3000';
-const summaryPath = `http://localhost:3000/inventory/ingredient-summary`
-const lowPath = `${backendUrl}/inventory/low-summary`
-const expiringPath = `${backendUrl}/inventory/expiring-summary`
+const summaryPath = `/inventory/ingredient-summary`
+const lowPath = `/inventory/low-summary`
+const expiringPath = `/inventory/expiring-summary`
 
 const summaryColumns: IngredientColumn[] = [
   { label: 'Ingredient', path: 'ingredientName'},

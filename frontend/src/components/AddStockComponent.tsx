@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import axios from 'axios';
+import api from '../Auth/api.ts';
 
 interface Ingredient {
   ingredientName: string;
@@ -58,7 +58,7 @@ class AddInventory extends Component<{}, State> {
     const inventory: Inventory = { stockDate, ingredients };
     console.log(JSON.stringify(inventory))
     try {
-      await axios.post('http://localhost:3000/inventory/stock', inventory, { withCredentials: true });
+      await api.post('/inventory/stock', inventory, { withCredentials: true });
       alert('Inventory added successfully');
       this.setState({
         stockDate: '',

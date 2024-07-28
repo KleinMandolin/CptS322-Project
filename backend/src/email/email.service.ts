@@ -1,31 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import * as nodeMailer from 'nodemailer';
+import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EmailService {
-  private transporter: nodeMailer.Transporter;
+  private mailgunApiKey: string;
+  private mailgunDomain: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.transporter = nodeMailer.createTransport({
-      host: this.configService.get<string>('MAILGUN_HOST'),
-      auth: {
-        // Configured email .env file.
-        user: this.configService.get<string>('MAILGUN_LOGIN'),
-        pass: this.configService.get<string>('MAILGUN_PASS'),
-      },
-    });
+    this.mailgunApiKey = this.configService.get<string>('MAILGUN_API_KEY');
+    this.mailgunDomain = this.configService.get<string>('MAILGUN_DOMAIN');
   }
 
   // Send email to an email(subject, text) account.
   async sendEmail(to: string, subject: string, text: string): Promise<void> {
-    const mailOptions = {
-      from: `Excited User <mailgun@${this.configService.get<string>('MAILGUN_DOMAIN')}`,
+    const url = `https://api.mailgun.net/v3/${this.mailgunDomain}/messages`;
+    const auth = Buffer.from(`api:${this.mailgunApiKey}`).toString('base64');
+
+    const data = new URLSearchParams({
+      from: `Excited User <mailgun@${this.mailgunDomain}>`,
       to,
       subject,
       text,
-    };
+    });
 
-    await this.transporter.sendMail(mailOptions);
+    try {
+      const response = await axios.post(url, data, {
+        headers: {
+          Authorization: `Basic ${auth}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+      console.log('Email sent successfully', response.data);
+    } catch (error) {
+      console.error(
+        'Error sending email:',
+        error.response?.data || error.message,
+      );
+      throw error;
+    }
   }
 }
