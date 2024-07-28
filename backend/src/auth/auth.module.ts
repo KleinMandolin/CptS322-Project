@@ -13,6 +13,7 @@ import { JwtStrategy } from '@/auth/strategies/jwt.strategy';
 import { UserManagementModule } from '@/user-management/modules/user-management.module';
 import { UserCredentialsService } from '@/user-management/services/user-credentials.service';
 import { UserInfoService } from '@/user-management/services/user-info.service';
+import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { UserInfoService } from '@/user-management/services/user-info.service';
     JwtStrategy,
     UserCredentialsService,
     UserInfoService,
+    JwtAuthGuard,
   ],
   controllers: [AuthController],
 })
