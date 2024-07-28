@@ -126,8 +126,6 @@ TODO:
 
 TODO: 
 
-- Admins are unable to add users.
-
 
 ## Contributing
 
