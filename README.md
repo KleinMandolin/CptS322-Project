@@ -27,7 +27,10 @@ The secure login will be MFA at minimum, with every feature except for the order
 - Install NodeJS - `sudo apt install nodejs`
 - Install NPM - `sudo apt install npm`
 - Install PostgreSQL - `sudo apt install postgresql`
-- TODO: Description of setting up Mailgun account
+- Create mailgun account
+- Get mailgun api key
+- Get mailgun domain
+- The domain and api key from mailgun will be used for the .env files.
 
 
 ### Add-ons
@@ -59,24 +62,29 @@ The secure login will be MFA at minimum, with every feature except for the order
 
 1. Set up PostgrSQL
    </br>`psql -U postgres`
-   </br>`create database [database name]`
+   </br>`create database wok_this_way`
    </br>`\q`
 2. Install dependencies. Separately for both the 'frontend' and 'backend' folders, run
    </br>`npm i`
 3. Create a file `.env` in 'backend' folder, then paste in the below text and save:
 ```   
-DB_HOST=your database host
-DB_PORT=your database port
-DB_USERNAME=your username
-DB_NAME=your database name
-MAILGUN_DOMAIN=your mailgun domain
-MAILGUN_API_KEY=your mailgun api key
-JWT_SECRET=your jwt secret
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_NAME=wok_this_way
+MAILGUN_DOMAIN=[your mailgun domain]
+MAILGUN_API_KEY=[your mailgun api key]
+JWT_SECRET=your [jwt secret]
+```
+4. Create a file `.env` in the 'frontend' folder, paste in the below text and save:
+```
+PORT=3001
+VITE_BACKEND_URL=https://localhost:3000
 ```
 
    
-4. Open separate terminals in the 'frontend' and 'backend' directories. Type `npm run start` in the backend terminal first, then type `npm run dev` in the frontend directory.
-5. Navigate to the frontend page at [http://localhost:3001](http://localhost:3001)
+5. Open separate terminals in the 'frontend' and 'backend' directories. Type `npm run start` in the backend terminal first, then type `npm run dev` in the frontend directory.
+6. Navigate to the frontend page at [http://localhost:3001](http://localhost:3001)
 
 
 ## Functionality
